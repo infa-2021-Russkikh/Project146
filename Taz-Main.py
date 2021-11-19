@@ -62,7 +62,7 @@ def main():
     bg.fill(Color(BACKGROUND_COLOR))     # Заливаем поверхность сплошным цветом
 
     while 1:  # Основной цикл программы
-        timer.tick(60)
+        timer.tick(160)
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit("QUIT")
@@ -91,7 +91,7 @@ def main():
                 x += PLATFORM_WIDTH # блоки платформы ставятся на ширине блоков
             y += PLATFORM_HEIGHT    # то же самое и с высотой
             x = 0
-        hero.update(left, right, up ) # передвижение
+        hero.update(left, right, up, platforms ) # передвижение
         entities.draw(screen) # отображение
         pygame.display.update()     # обновление и вывод всех изменений на экран
         

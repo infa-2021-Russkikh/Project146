@@ -3,7 +3,6 @@
 from pygame import *
 import ctypes
 
-
 MOVE_SPEED = 7
 WIDTH = 22
 HEIGHT = 32
@@ -15,7 +14,6 @@ WIN_WIDTH = user32.GetSystemMetrics(0)
 WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 up = False
-
 
 class Player(sprite.Sprite):
     def __init__(self, x, y, HEALTH=100):
@@ -69,6 +67,11 @@ class Player(sprite.Sprite):
                 if yvel < 0:                      # если движется вверх
                     self.rect.top = p.rect.bottom  # то не движется вверх
                     self.yvel = 0                 # и энергия прыжка пропадает
+
+    def collide_enemy(self, enemies, hero):
+        for en in enemies:
+            if sprite.collide_rect(self, en):
+                hero.health = 0
 
     # def get_hurt(self, yvel, health, platforms):  # получение урона от падения
     #     for p in platforms:

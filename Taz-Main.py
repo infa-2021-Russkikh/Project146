@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import pygame
-from pygame import *
 from Player import *
 from Enemy import *
 from blocks import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
 import ctypes
 
 # Объявляем переменные
@@ -25,45 +26,51 @@ timer = pygame.time.Clock()
 def main():
     typical_enemy = Enemy(220, 310)
     hero = Player(55, 55)  # создаем героя по (x,y) координатам
-    left = right = False    # по умолчанию — стоим
+    left = right = False  # по умолчанию — стоим
     up = False
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
+    enemies = []
     entities.add(hero)
     entities.add(typical_enemy)
 
     level = [
-       "------------------------------------------------",
-       "-                                              -",
-       "-                                              -",
-       "-                                              -",
-       "-            --                                -",
-       "-                            -   --            -",
-       "--                                             -",
-       "-                                              -",
-       "-                   ---                        -",
-       "-                                              -",
-       "-                   --            --           -",
-       "-    -----                                     -",
-       "-                                              -",
-       "-      --------                                -",
-       "-                                ---           -",
-       "-                -                             -",
-       "-                   --                         -",
-       "-       ----                                   -",
-       "-                                    -----     -",
-       "-                      --                      -",
-       "-                                              -",
-       "-                             ----             -",
-       "-                                              -",
-       "-                                              -",
-       "------------------------------------------------"]
+        "------------------------------------------------",
+        "-                                              -",
+        "-                                              -",
+        "-                                              -",
+        "-            --                                -",
+        "-                            -   --            -",
+        "--                                             -",
+        "-                                              -",
+        "-                   ---                        -",
+        "-                                              -",
+        "-                   --            --           -",
+        "-    -----                                     -",
+        "-                                              -",
+        "-      --------                                -",
+        "-                                ---           -",
+        "-                -                             -",
+        "-                   --                         -",
+        "-       ----                                   -",
+        "-                                    -----     -",
+        "-                      --                      -",
+        "-                                              -",
+        "-                             ----             -",
+        "-                                              -",
+        "-                                              -",
+        "------------------------------------------------"]
+
+    enemies.append(typical_enemy)
 
     pygame.init()  # Инициация PyGame, обязательная строчка
     screen = pygame.display.set_mode(DISPLAY)  # Создаем окошко
+    # screen = pygame.display.set_mode(DISPLAY, pygame.DOUBLEBUF | pygame.OpenGL)  # Создаем окошко
     pygame.display.set_caption("SUPER FOPF BOY")  # Пишем в шапку
     bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности,   будем использовать как фон
-    bg.fill(Color(BACKGROUND_COLOR))     # Заливаем поверхность сплошным цветом
+    # glClearColor(BACKGROUND_COLOR/255, 1)
+
+    bg.fill(Color(BACKGROUND_COLOR))  # Заливаем поверхность сплошным цветом
 
     x = y = 0  # координаты
     for row in level:  # вся строка
@@ -77,8 +84,8 @@ def main():
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
         x = 0
-
-    while 1:  # Основной цикл программы
+    running = True
+    while running:  # Основной цикл программы
         timer.tick(FPS)
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
@@ -96,15 +103,19 @@ def main():
         if e.type == KEYUP and e.key == K_LEFT:
             left = False
 
+        # glClear(GL_COLOR_BUFFER_BIT)
+        hero.collide_enemy(enemies, hero)
+
         screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
         hero.update(left, right, up, platforms)  # передвижение
         typical_enemy.update()
         entities.draw(screen)  # отображение
+
         if hero.health <= 0:
-            quit()
+            running = False
 
         pygame.display.update()  # обновление и вывод всех изменений на экран
-        
+
 
 if __name__ == "__main__":
     main()

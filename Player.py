@@ -3,17 +3,18 @@
 from pygame import *
 import ctypes
 
-MOVE_SPEED = 7
-WIDTH = 22
-HEIGHT = 32
 COLOR = "#888888"
-JUMP_POWER = 10
-GRAVITY = 0.35
 user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)
 WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
+WIDTH = WIN_WIDTH * 16 / 960
+HEIGHT = WIN_HEIGHT * 7 / 135
+GRAVITY = WIN_HEIGHT * 5.4 / 21600
+JUMP_POWER = WIN_HEIGHT/108
+MOVE_SPEED = WIN_WIDTH * 8 / 1920
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 up = False
+
 
 class Player(sprite.Sprite):
     def __init__(self, x, y, HEALTH=100):

@@ -17,25 +17,70 @@ DISPLAY = (WIN_WIDTH, WIN_HEIGHT)  # Группируем ширину и выс
 BACKGROUND_COLOR = "#004400"
 FPS = 60
 RED = (255, 0, 0)
+GREEN = (0, 155, 55)
 # PLATFORM_WIDTH = 32
 # PLATFORM_HEIGHT = 32
 # PLATFORM_COLOR = "#FF6262"
+is_game_over = False
+running_1 = False
 
 up = False
 timer = pygame.time.Clock()
 
 
+def menu(bg, screen):
+    global running_1, is_menu
+    screen.fill(Color(GREEN))
+    start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                              WIN_HEIGHT / 15, 'Start')
+    start_button.draw(screen)
+    pygame.display.update()
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if start_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = False
+                    running_1 = True
+                    run = False
+    pygame.display.update()
+    return running_1, is_menu
+
+
 def game_over(bg, screen):
+    global is_menu, running_1, is_game_over
     screen.fill(Color(WHITE))
-    game_over_button = Button(RED, WIN_WIDTH/2 - WIN_WIDTH/19.2, WIN_HEIGHT/2 - WIN_HEIGHT/27, WIN_WIDTH/19.2,
-                              WIN_HEIGHT/27, 'GAME OVER ^_^')
-    game_over_button.draw(screen)
+    restart_button = Button(RED, WIN_WIDTH/2 - WIN_WIDTH/6.2, WIN_HEIGHT/2 - WIN_HEIGHT/27, WIN_WIDTH/3.2,
+                              WIN_HEIGHT/15, 'GAME OVER ^_^')
+    restart_button.draw(screen)
+    pygame.display.update()
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if restart_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = False
+                    running_1 = True
+                    is_game_over = False
+                    run = False
+    pygame.display.update()
+    return is_menu, running_1, is_game_over
 
 
-
-def main():
-    typical_enemy = Enemy(WIN_WIDTH/7, WIN_HEIGHT/2.65)
-    hero = Player(WIN_WIDTH/35, WIN_HEIGHT/19.6)  # создаем героя по (x,y) координатам
+def level_1(bg, screen):
+    global is_game_over, running_1
+    typical_enemy = Enemy(WIN_WIDTH / 7, WIN_HEIGHT / 2.65)
+    hero = Player(WIN_WIDTH / 35, WIN_HEIGHT / 19.6)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию — стоим
     up = False
     entities = pygame.sprite.Group()  # Все объекты
@@ -73,15 +118,6 @@ def main():
 
     enemies.append(typical_enemy)
 
-    pygame.init()  # Инициация PyGame, обязательная строчка
-    screen = pygame.display.set_mode(DISPLAY)
-    # screen = pygame.display.set_mode(DISPLAY, pygame.DOUBLEBUF | pygame.OpenGL)  # Создаем окошко
-    pygame.display.set_caption("SUPER FOPF BOY")  # Пишем в шапку
-    bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности,   будем использовать как фон
-    # glClearColor(BACKGROUND_COLOR/255, 1)
-
-    bg.fill(Color(BACKGROUND_COLOR))  # Заливаем поверхность сплошным цветом
-
     x = y = 0  # координаты
     for row in level:  # вся строка
         for col in row:  # каждый символ
@@ -94,26 +130,26 @@ def main():
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
         x = 0
-    running = True
-    while running:  # Основной цикл программы
+    pygame.display.update()
+    run = True
+    while run:
         timer.tick(FPS)
-        for e in pygame.event.get():  # Обрабатываем события
-            if e.type == QUIT:
+        for event in pygame.event.get():  # Обрабатываем события
+            if event.type == QUIT:
                 raise SystemExit("QUIT")
-        if e.type == KEYDOWN and e.key == K_UP:
-            up = True
-        if e.type == KEYUP and e.key == K_UP:
-            up = False
-        if e.type == KEYDOWN and e.key == K_LEFT:
-            left = True
-        if e.type == KEYDOWN and e.key == K_RIGHT:
-            right = True
-        if e.type == KEYUP and e.key == K_RIGHT:
-            right = False
-        if e.type == KEYUP and e.key == K_LEFT:
-            left = False
+            if event.type == KEYDOWN and event.key == K_UP:
+                up = True
+            if event.type == KEYUP and event.key == K_UP:
+                up = False
+            if event.type == KEYDOWN and event.key == K_LEFT:
+                left = True
+            if event.type == KEYDOWN and event.key == K_RIGHT:
+                right = True
+            if event.type == KEYUP and event.key == K_RIGHT:
+                right = False
+            if event.type == KEYUP and event.key == K_LEFT:
+                left = False
 
-        # glClear(GL_COLOR_BUFFER_BIT)
         hero.collide_enemy(enemies, hero)
 
         if hero.health > 0:
@@ -122,9 +158,34 @@ def main():
             typical_enemy.update()
             entities.draw(screen)  # отображение
         elif hero.health <= 0:
+            is_game_over = True
+            run = False
+            running_1 = False
             game_over(bg, screen)
-            # running = False
         pygame.display.update()  # обновление и вывод всех изменений на экран
+    return is_game_over, running_1
+
+
+def main():
+    pygame.init()  # Инициация PyGame, обязательная строчка
+    screen = pygame.display.set_mode(DISPLAY)
+    # screen = pygame.display.set_mode(DISPLAY, pygame.DOUBLEBUF | pygame.OpenGL)  # Создаем окошко
+    pygame.display.set_caption("SUPER FOPF BOY")  # Пишем в шапку
+    bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности,   будем использовать как фон
+    # running = False
+    # glClearColor(BACKGROUND_COLOR/255, 1)
+    menu(bg, screen)
+    runnin = True
+    while runnin:
+        if is_menu:
+            while is_menu:
+                menu(bg, screen)
+        elif running_1:
+            while running_1:
+                level_1(bg, screen)
+        elif is_game_over:
+            while is_game_over:
+                game_over(bg, screen)
 
 
 if __name__ == "__main__":

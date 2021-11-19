@@ -10,6 +10,7 @@ class Button:
         self.width = width
         self.height = height
         self.text = text
+        self.rect = pygame.Rect(x, y, width, height)
 
     def draw(self, win, outline=None):
         # Call this method to draw the button on the screen
@@ -18,5 +19,15 @@ class Button:
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), 0)
         if self.text != '':
             font = pygame.font.Font('Nazhdak W08 Regular.ttf', 60)
-            text = font.render(self.text, 1, (0,0,0))
-            win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
+            text = font.render(self.text, 1, (0, 0, 0))
+            win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 -
+                                                                                                text.get_height()/2)))
+
+    def is_pressed(self, pos, pressed):
+        if self.rect.collidepoint(pos):
+            if pressed[0]:
+                return True
+            return False
+        return False
+
+

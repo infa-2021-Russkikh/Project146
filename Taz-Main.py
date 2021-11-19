@@ -3,6 +3,7 @@
 import pygame
 from pygame import *
 from Player import *
+from Enemy import *
 from blocks import *
 import ctypes
 
@@ -12,6 +13,7 @@ WIN_WIDTH = user32.GetSystemMetrics(0)
 WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)  # Группируем ширину и высоту в одну переменную
 BACKGROUND_COLOR = "#004400"
+FPS = 60
 # PLATFORM_WIDTH = 32
 # PLATFORM_HEIGHT = 32
 # PLATFORM_COLOR = "#FF6262"
@@ -21,13 +23,14 @@ timer = pygame.time.Clock()
 
 
 def main():
-
+    typical_enemy = Enemy(220, 310)
     hero = Player(55, 55)  # создаем героя по (x,y) координатам
     left = right = False    # по умолчанию — стоим
     up = False
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
     entities.add(hero)
+    entities.add(typical_enemy)
 
     level = [
        "------------------------------------------------",
@@ -35,23 +38,23 @@ def main():
        "-                                              -",
        "-                                              -",
        "-            --                                -",
-       "-                                              -",
+       "-                            -   --            -",
        "--                                             -",
        "-                                              -",
        "-                   ---                        -",
        "-                                              -",
+       "-                   --            --           -",
+       "-    -----                                     -",
        "-                                              -",
-       "-      ---                                     -",
-       "-                                              -",
-       "-   -----------                                -",
-       "-                                              -",
+       "-      --------                                -",
+       "-                                ---           -",
        "-                -                             -",
        "-                   --                         -",
+       "-       ----                                   -",
+       "-                                    -----     -",
+       "-                      --                      -",
        "-                                              -",
-       "-                                              -",
-       "-                                              -",
-       "-                                              -",
-       "-                                              -",
+       "-                             ----             -",
        "-                                              -",
        "-                                              -",
        "------------------------------------------------"]
@@ -59,8 +62,7 @@ def main():
     pygame.init()  # Инициация PyGame, обязательная строчка
     screen = pygame.display.set_mode(DISPLAY)  # Создаем окошко
     pygame.display.set_caption("SUPER FOPF BOY")  # Пишем в шапку
-    bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности
-                                         # будем использовать как фон
+    bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности,   будем использовать как фон
     bg.fill(Color(BACKGROUND_COLOR))     # Заливаем поверхность сплошным цветом
 
     x = y = 0  # координаты
@@ -77,7 +79,7 @@ def main():
         x = 0
 
     while 1:  # Основной цикл программы
-        timer.tick(60)
+        timer.tick(FPS)
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit("QUIT")
@@ -96,7 +98,11 @@ def main():
 
         screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
         hero.update(left, right, up, platforms)  # передвижение
+        typical_enemy.update()
         entities.draw(screen)  # отображение
+        if hero.health <= 0:
+            quit()
+
         pygame.display.update()  # обновление и вывод всех изменений на экран
         
 

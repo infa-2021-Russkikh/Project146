@@ -9,7 +9,7 @@ from pygame import *
 PLATFORM_WIDTH = 32
 PLATFORM_HEIGHT = 32
 PLATFORM_COLOR = "#FF6262"
-ICON_DIR = os.path.dirname(__file__) #  Полный путь к каталогу с файлами
+ICON_DIR = os.path.dirname(__file__)  # Полный путь к каталогу с файлами
 
 
 class Platform(sprite.Sprite):

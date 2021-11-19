@@ -1,6 +1,12 @@
+from pygame import sprite
+from pygame.color import Color
+from pygame.rect import Rect
+from pygame.surface import Surface
+
 PLATFORM_WIDTH = 32
 PLATFORM_HEIGHT = 32
 PLATFORM_COLOR = "#FF6262"
+
 
 class Platform(sprite.Sprite):
     def __init__(self, x, y):

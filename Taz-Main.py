@@ -5,10 +5,10 @@ from Player import *
 from Enemy import *
 from blocks import *
 from buttones import *
-from OpenGL.GL import *
-from OpenGL.GLU import *
+#from OpenGL.GL import *
+#   from OpenGL.GLU import *
 import ctypes
-
+import os
 # Объявляем переменные
 user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)

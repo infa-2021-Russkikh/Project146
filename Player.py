@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*- 
 from pygame import *
 import ctypes
+import os
+import pyganim
 
 COLOR = "#888888"
 user32 = ctypes.windll.user32
@@ -13,7 +15,23 @@ GRAVITY = WIN_HEIGHT * 5.4 / 21600
 JUMP_POWER = WIN_HEIGHT/108
 MOVE_SPEED = WIN_WIDTH * 8 / 1920
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
+ANIMATION_DELAY = 0.1 # скорость смены кадров
+ICON_DIR = os.path.dirname(__file__) #  Полный путь к каталогу с файлами
 up = False
+ANIMATION_RIGHT = [('%s/FOPF/r1.png' % ICON_DIR),
+            ('%s/FOPF/r2.png' % ICON_DIR),
+            ('%s/FOPF/r3.png' % ICON_DIR),
+            ('%s/FOPF/r4.png' % ICON_DIR),
+            ('%s/FOPF/r5.png' % ICON_DIR)]
+ANIMATION_LEFT = [('%s/FOPF/l1.png' % ICON_DIR),
+            ('%s/FOPF/l2.png' % ICON_DIR),
+            ('%s/FOPF/l3.png' % ICON_DIR),
+            ('%s/FOPF/l4.png' % ICON_DIR),
+            ('%s/FOPF/l5.png' % ICON_DIR)]
+ANIMATION_JUMP_LEFT = [('%s/FOPF/jl.png' % ICON_DIR, 0.1)]
+ANIMATION_JUMP_RIGHT = [('%s/FOPF/jr.png' % ICON_DIR, 0.1)]
+ANIMATION_JUMP = [('%s/FOPF/j.png' % ICON_DIR, 0.1)]
+ANIMATION_STAY = [('%s/FOPF/0.png' % ICON_DIR, 0.1)]
 
 
 class Player(sprite.Sprite):
@@ -28,19 +46,63 @@ class Player(sprite.Sprite):
         self.yvel = 0  # скорость вертикального перемещения
         self.onGround = False  # На земле ли я?
         self.health = HEALTH
+        self.image.set_colorkey(Color(COLOR)) # делаем фон прозрачным
+        #        Анимация движения вправо
+        boltAnim = []
+        for anim in ANIMATION_RIGHT:
+            boltAnim.append((anim, ANIMATION_DELAY))
+        self.boltAnimRight = pyganim.PygAnimation(boltAnim)
+        self.boltAnimRight.play()
+#        Анимация движения влево        
+        boltAnim = []
+        for anim in ANIMATION_LEFT:
+            boltAnim.append((anim, ANIMATION_DELAY))
+        self.boltAnimLeft = pyganim.PygAnimation(boltAnim)
+        self.boltAnimLeft.play()
+        
+        self.boltAnimStay = pyganim.PygAnimation(ANIMATION_STAY)
+        self.boltAnimStay.play()
+        self.boltAnimStay.blit(self.image, (0, 0)) # По-умолчанию, стоим
+        
+        self.boltAnimJumpLeft= pyganim.PygAnimation(ANIMATION_JUMP_LEFT)
+        self.boltAnimJumpLeft.play()
+        
+        self.boltAnimJumpRight= pyganim.PygAnimation(ANIMATION_JUMP_RIGHT)
+        self.boltAnimJumpRight.play()
+        
+        self.boltAnimJump= pyganim.PygAnimation(ANIMATION_JUMP)
+        self.boltAnimJump.play()
+        
 
     def update(self,  left, right, up, platforms):
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.yvel = -JUMP_POWER
+            self.image.fill(Color(COLOR))
+            self.boltAnimJump.blit(self.image, (0, 0))
         if left:
             self.xvel = -MOVE_SPEED  # Лево
+            self.image.fill(Color(COLOR))
+            if up: # для прыжка влево есть отдельная анимация
+                self.boltAnimJumpLeft.blit(self.image, (0, 0))
+            else:
+                self.boltAnimLeft.blit(self.image, (0, 0))
+            
  
         if right:
             self.xvel = MOVE_SPEED  # Право
+            self.xvel = MOVE_SPEED # Право = x + n
+            self.image.fill(Color(COLOR))
+            if up:
+                self.boltAnimJumpRight.blit(self.image, (0, 0))
+            else:
+                self.boltAnimRight.blit(self.image, (0, 0))
          
         if not(left or right):  # стоим, когда нет указаний идти
             self.xvel = 0
+            if not up:
+                self.image.fill(Color(COLOR))
+                self.boltAnimStay.blit(self.image, (0, 0))
         if not self.onGround:
             self.yvel += GRAVITY
         self.onGround = False  # Мы не знаем, когда мы на земле((

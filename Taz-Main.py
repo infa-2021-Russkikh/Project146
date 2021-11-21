@@ -22,18 +22,31 @@ GREEN = (0, 155, 55)
 # PLATFORM_HEIGHT = 32
 # PLATFORM_COLOR = "#FF6262"
 is_game_over = False
-running_1 = False
+running_1 = 0
+is_pause_menu = False
 
 up = False
 timer = pygame.time.Clock()
 
 
 def menu(bg, screen):
+    """
+
+    :param bg: background of game window
+    :param screen: general screen of window
+    :return:
+    """
     global running_1, is_menu
     screen.fill(Color(GREEN))
+
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                               WIN_HEIGHT / 15, 'Start')
     start_button.draw(screen)
+
+    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                              WIN_HEIGHT / 15, 'Quit')
+    quit_button.draw(screen)
+
     pygame.display.update()
     run = True
     while run:
@@ -48,16 +61,61 @@ def menu(bg, screen):
                     is_menu = False
                     running_1 = True
                     run = False
+                if quit_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = False
+                    running_1 = False
+                    run = False
     pygame.display.update()
+    return running_1, is_menu
+
+
+def pause_menu(bg, screen):
+    global running_1, is_menu
+
+    continue_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                          WIN_HEIGHT / 15, 'Continue')
+    continue_button.draw(screen)
+
+    menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
+                          WIN_HEIGHT / 15, 'Menu')
+    menu_button.draw(screen)
+
+    pygame.display.update()
+
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if continue_button.is_pressed(mouse_pos, mouse_pressed):
+                    running_1 = 1
+                    run = False
+                if menu_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = True
+                    running_1 = 0
+                    run = False
+        pygame.display.update()
     return running_1, is_menu
 
 
 def game_over(bg, screen):
     global is_menu, running_1, is_game_over
     screen.fill(Color(WHITE))
+
     restart_button = Button(RED, WIN_WIDTH/2 - WIN_WIDTH/6.2, WIN_HEIGHT/2 - WIN_HEIGHT/27, WIN_WIDTH/3.2,
-                              WIN_HEIGHT/15, 'GAME OVER ^_^')
+                              WIN_HEIGHT/15, 'Restart')
     restart_button.draw(screen)
+
+    menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
+                         WIN_HEIGHT / 15, 'Menu')
+    menu_button.draw(screen)
+
+    game_over_text = Button(RED, WIN_WIDTH/2, WIN_HEIGHT/2 - WIN_HEIGHT/7, 0.1, 0.1, 'GAME OVER ^_^')
+    game_over_text.draw(screen)
     pygame.display.update()
     run = True
     while run:
@@ -71,6 +129,10 @@ def game_over(bg, screen):
                 if restart_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = False
                     running_1 = True
+                    is_game_over = False
+                    run = False
+                if menu_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = True
                     is_game_over = False
                     run = False
     pygame.display.update()
@@ -88,6 +150,7 @@ def level_1(bg, screen):
     enemies = []
     entities.add(hero)
     entities.add(typical_enemy)
+    enemies.append(typical_enemy)
 
     level = [
         "------------------------------------------------",
@@ -116,8 +179,6 @@ def level_1(bg, screen):
         "-                                              -",
         "------------------------------------------------"]
 
-    enemies.append(typical_enemy)
-
     x = y = 0  # координаты
     for row in level:  # вся строка
         for col in row:  # каждый символ
@@ -130,39 +191,47 @@ def level_1(bg, screen):
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
         x = 0
-    pygame.display.update()
+
     run = True
     while run:
         timer.tick(FPS)
-        for event in pygame.event.get():  # Обрабатываем события
-            if event.type == QUIT:
-                raise SystemExit("QUIT")
-            if event.type == KEYDOWN and event.key == K_UP:
-                up = True
-            if event.type == KEYUP and event.key == K_UP:
-                up = False
-            if event.type == KEYDOWN and event.key == K_LEFT:
-                left = True
-            if event.type == KEYDOWN and event.key == K_RIGHT:
-                right = True
-            if event.type == KEYUP and event.key == K_RIGHT:
-                right = False
-            if event.type == KEYUP and event.key == K_LEFT:
-                left = False
+        if running_1 == 1:
+            for event in pygame.event.get():  # Обрабатываем события
+                if event.type == QUIT:
+                    raise SystemExit("QUIT")
+                if event.type == KEYDOWN and event.key == K_UP:
+                    up = True
+                if event.type == KEYUP and event.key == K_UP:
+                    up = False
+                if event.type == KEYDOWN and event.key == K_LEFT:
+                    left = True
+                if event.type == KEYDOWN and event.key == K_RIGHT:
+                    right = True
+                if event.type == KEYUP and event.key == K_RIGHT:
+                    right = False
+                if event.type == KEYUP and event.key == K_LEFT:
+                    left = False
+                if event.type == KEYDOWN and event.key == K_ESCAPE:
+                    running_1 = 2
 
-        hero.collide_enemy(enemies, hero)
-
-        if hero.health > 0:
-            screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
-            hero.update(left, right, up, platforms)  # передвижение
-            typical_enemy.update()
-            entities.draw(screen)  # отображение
-        elif hero.health <= 0:
-            is_game_over = True
+            hero.collide_enemy(enemies, hero)
+            if hero.health > 0:
+                screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
+                hero.update(left, right, up, platforms)  # передвижение
+                typical_enemy.update()
+                entities.draw(screen)  # отображение
+            elif hero.health <= 0:
+                is_game_over = True
+                run = False
+                running_1 = 0
+                game_over(bg, screen)
+            pygame.display.update()  # обновление и вывод всех изменений на экран
+        elif running_1 == 2:
+            while running_1 == 2:
+                pause_menu(bg, screen)
+        elif running_1 == 0:
             run = False
-            running_1 = False
-            game_over(bg, screen)
-        pygame.display.update()  # обновление и вывод всех изменений на экран
+
     return is_game_over, running_1
 
 
@@ -180,12 +249,14 @@ def main():
         if is_menu:
             while is_menu:
                 menu(bg, screen)
-        elif running_1:
+        elif running_1 != 0:
             while running_1:
                 level_1(bg, screen)
         elif is_game_over:
             while is_game_over:
                 game_over(bg, screen)
+        else:
+            runnin = False
 
 
 if __name__ == "__main__":

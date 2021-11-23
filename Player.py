@@ -10,7 +10,7 @@ user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)
 WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
 WIDTH = WIN_WIDTH * 16 / 960
-HEIGHT = WIN_HEIGHT * 7 / 135
+HEIGHT = WIN_HEIGHT * 5.5 / 135
 GRAVITY = WIN_HEIGHT * 8.4 / 21600
 JUMP_POWER = WIN_HEIGHT / 108
 MOVE_SPEED = WIN_WIDTH * 4 / 1920
@@ -47,7 +47,7 @@ class Player(sprite.Sprite):
         self.onGround = False  # На земле ли я?
         self.health = HEALTH
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
-        #        Анимация движения вправо
+        # Анимация движения вправо
         boltAnim = []
         for anim in ANIMATION_RIGHT:
             boltAnim.append((anim, ANIMATION_DELAY))

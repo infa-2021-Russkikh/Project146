@@ -4,10 +4,10 @@ from Player import *
 from Enemy import *
 from blocks import *
 from buttones import *
-#from OpenGL.GL import *
-#   from OpenGL.GLU import *
+# from OpenGL.GL import *
+# from OpenGL.GLU import *
 import ctypes
-import os
+# import os
 # Объявляем переменные
 user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)
@@ -21,6 +21,7 @@ GREEN = (0, 155, 55)
 # PLATFORM_HEIGHT = WIN_HEIGHT / 25.25
 # PLATFORM_COLOR = "#FF6262"
 
+Number_of_level = 1
 is_game_over = False
 running_1 = 0
 is_pause_menu = False
@@ -156,17 +157,18 @@ def game_over(bg, screen):
 
 
 def level_1(bg, screen):
-    global is_game_over, running_1
+    global is_game_over, running_1, is_menu
 
     pygame.mixer.music.load("chocolate-chip-by-uncle-morris.mp3")
     pygame.mixer.music.play(-1)
 
     typical_enemy = Enemy(WIN_WIDTH / 7, WIN_HEIGHT / 2.65)
-    hero = Player(WIN_WIDTH / 35, WIN_HEIGHT / 19.6)  # создаем героя по (x,y) координатам
+    hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию — стоим
-    up = False
+    Up = False
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
+    level_exits = []
     enemies = []
     entities.add(hero)
     entities.add(typical_enemy)
@@ -174,22 +176,22 @@ def level_1(bg, screen):
 
     level = [
         "------------------------------------------------",
+        "-                                               ",
+        "-                   ---           --           *",
+        "-                        -   --                 ",
+        "-            --                        --      -",
+        "-                    --      -   --            -",
+        "--                                       --    -",
+        "-            -              --                 -",
+        "-                     -               --       -",
         "-                                              -",
-        "-                                              -",
-        "-                                              -",
-        "-            --                                -",
-        "-                            -   --            -",
-        "--                                             -",
-        "-                                              -",
-        "-                   ---                        -",
-        "-                                              -",
-        "-                   --            --           -",
+        "-              -    --            --           -",
         "-    -----                                     -",
-        "-                                              -",
+        "-                          --        -         -",
         "-      --------                                -",
         "-                                ---           -",
         "-                -                             -",
-        "-                   --                         -",
+        "-                   --          ------         -",
         "-       ----                                   -",
         "-                                    -----     -",
         "-                      --                      -",
@@ -207,6 +209,10 @@ def level_1(bg, screen):
                 pf = Platform(x, y)
                 entities.add(pf)
                 platforms.append(pf)
+            if col == "*":
+                level_exit = Level_exit(x, y)
+                entities.add(level_exit)
+                level_exits.append(level_exit)
 
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
@@ -220,13 +226,13 @@ def level_1(bg, screen):
                 if event.type == QUIT:
                     raise SystemExit("QUIT")
                 if event.type == KEYDOWN and event.key == K_UP:
-                    up = True
+                    Up = True
                 if event.type == KEYDOWN and event.key == K_w:
-                    up = True
+                    Up = True
                 if event.type == KEYUP and event.key == K_UP:
-                    up = False
+                    Up = False
                 if event.type == KEYUP and event.key == K_w:
-                    up = False
+                    Up = False
                 if event.type == KEYDOWN and event.key == K_LEFT:
                     left = True
                 if event.type == KEYDOWN and event.key == K_a:
@@ -249,9 +255,14 @@ def level_1(bg, screen):
             hero.collide_enemy(enemies, hero)
             if hero.health > 0:
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
-                hero.update(left, right, up, platforms)  # передвижение
+                hero.update(left, right, Up, platforms)  # передвижение
                 typical_enemy.update()
                 entities.draw(screen)  # отображение
+                for e in level_exits:
+                    if sprite.collide_rect(hero, e):
+                        running_1 = 0
+                        run = False
+                        is_menu = True
             elif hero.health <= 0:
                 is_game_over = True
                 run = False

@@ -7,7 +7,9 @@ from buttones import *
 # from OpenGL.GL import *
 # from OpenGL.GLU import *
 import ctypes
+
 # import os
+
 # Объявляем переменные
 user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)
@@ -22,6 +24,7 @@ GREEN = (0, 155, 55)
 # PLATFORM_COLOR = "#FF6262"
 
 Number_of_level = 1
+is_levels = False
 is_game_over = False
 running_1 = 0
 is_pause_menu = False
@@ -37,7 +40,7 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global running_1, is_menu
+    global running_1, is_menu, is_levels
     pygame.mixer.music.load("menu_music.mp3")
     pygame.mixer.music.play(-1)
     screen.fill(Color(GREEN))
@@ -45,6 +48,10 @@ def menu(bg, screen):
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                           WIN_HEIGHT / 15, 'Start')
     start_button.draw(screen)
+
+    levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 3 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                           WIN_HEIGHT / 15, 'Levels')
+    levels_button.draw(screen)
 
     quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Quit')
@@ -68,8 +75,47 @@ def menu(bg, screen):
                     is_menu = False
                     running_1 = False
                     run = False
+                if levels_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = False
+                    is_levels = True
+                    run = False
     pygame.display.update()
     return running_1, is_menu
+
+
+def level_menu(screen):
+    global is_menu, running_1, is_levels
+
+    screen.fill(Color(GREEN))
+
+    level_1_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 3 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                            WIN_HEIGHT / 15, 'Level 1')
+    level_1_button.draw(screen)
+
+    back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                         WIN_HEIGHT / 15, 'Back')
+    back_button.draw(screen)
+
+    pygame.display.update()
+
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if level_1_button.is_pressed(mouse_pos, mouse_pressed):
+                    running_1 = True
+                    is_levels = False
+                    run = False
+                if back_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = True
+                    is_levels = False
+                    run = False
+
 
 
 def pause_menu(bg, screen):
@@ -109,6 +155,7 @@ def pause_menu(bg, screen):
                     running_1 = 0
                     run = False
         pygame.display.update()
+    pygame.mixer.music.unpause()
     return running_1, is_menu
 
 
@@ -292,6 +339,9 @@ def main():
         if is_menu:
             while is_menu:
                 menu(bg, screen)
+        elif is_levels:
+            while is_levels:
+                level_menu(screen)
         elif running_1 != 0:
             while running_1:
                 level_1(bg, screen)

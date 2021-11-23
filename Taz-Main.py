@@ -24,6 +24,7 @@ GREEN = (0, 155, 55)
 # PLATFORM_COLOR = "#FF6262"
 
 Number_of_level = 1
+menu_music = False
 is_levels = False
 is_game_over = False
 running_1 = 0
@@ -40,9 +41,10 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global running_1, is_menu, is_levels
-    pygame.mixer.music.load("menu_music.mp3")
-    pygame.mixer.music.play(-1)
+    global running_1, is_menu, is_levels, menu_music
+    if not menu_music:
+        pygame.mixer.music.load("menu_music.mp3")
+        pygame.mixer.music.play(-1)
     screen.fill(Color(GREEN))
 
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
@@ -69,6 +71,7 @@ def menu(bg, screen):
                 mouse_pressed = pygame.mouse.get_pressed()
                 if start_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = False
+                    menu_music = False
                     running_1 = True
                     run = False
                 if quit_button.is_pressed(mouse_pos, mouse_pressed):
@@ -77,6 +80,7 @@ def menu(bg, screen):
                     run = False
                 if levels_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = False
+                    menu_music = True
                     is_levels = True
                     run = False
     pygame.display.update()

@@ -4,10 +4,15 @@
 #from pygame.surface import Surface
 import os
 from pygame import *
+import ctypes
 
+# Объявляем переменные
+user32 = ctypes.windll.user32
+WIN_WIDTH = user32.GetSystemMetrics(0)
+WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
 
-PLATFORM_WIDTH = 32
-PLATFORM_HEIGHT = 32
+PLATFORM_WIDTH = WIN_WIDTH / 48
+PLATFORM_HEIGHT = WIN_HEIGHT / 25.25
 PLATFORM_COLOR = "#FF6262"
 ICON_DIR = os.path.dirname(__file__)  # Полный путь к каталогу с файлами
 

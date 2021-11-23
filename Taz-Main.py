@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 from Player import *
 from Enemy import *
-from blocks import *
+from textures import *
 from buttones import *
 # from OpenGL.GL import *
 # from OpenGL.GLU import *
 import ctypes
-
 # import os
 
 # Объявляем переменные
@@ -24,6 +23,8 @@ GREEN = (0, 155, 55)
 # PLATFORM_COLOR = "#FF6262"
 
 Number_of_level = 1
+is_landay = False
+is_gallery_menu = False
 menu_music = False
 is_levels = False
 is_game_over = False
@@ -41,11 +42,13 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global running_1, is_menu, is_levels, menu_music
+    global running_1, is_menu, is_levels, menu_music, is_gallery_menu
     if not menu_music:
-        pygame.mixer.music.load("menu_music.mp3")
+        pygame.mixer.music.load("Music/menu_music.mp3")
         pygame.mixer.music.play(-1)
-    screen.fill(Color(GREEN))
+    bg = pygame.image.load("additional task.png")
+    screen.blit(bg, (0, 0))
+    # screen.fill(Color(GREEN))
 
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                           WIN_HEIGHT / 15, 'Start')
@@ -54,6 +57,10 @@ def menu(bg, screen):
     levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 3 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                            WIN_HEIGHT / 15, 'Levels')
     levels_button.draw(screen)
+
+    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                           WIN_HEIGHT / 15, 'Gallery')
+    # gallery_button.draw(screen)
 
     quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Quit')
@@ -83,14 +90,26 @@ def menu(bg, screen):
                     menu_music = True
                     is_levels = True
                     run = False
+                # if gallery_button.is_pressed(mouse_pos, mouse_pressed):
+                #     is_menu = False
+                #     menu_music = True
+                #     is_gallery_menu = True
+                #     run = False
     pygame.display.update()
     return running_1, is_menu
 
 
-def level_menu(screen):
+def level_menu(bg, screen):
+    """
+
+    :param screen:
+    :return:
+    """
     global is_menu, running_1, is_levels
 
-    screen.fill(Color(GREEN))
+    bg = pygame.image.load("additional task.png")
+    screen.blit(bg, (0, 0))
+    # screen.fill(Color(GREEN))
 
     level_1_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 3 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                             WIN_HEIGHT / 15, 'Level 1')
@@ -120,6 +139,41 @@ def level_menu(screen):
                     is_levels = False
                     run = False
 
+
+def gallery_menu(bg, screen):
+    global is_menu, menu_music, is_gallery_menu
+
+    screen.fill(Color(GREEN))
+
+    if not is_landay:
+        picture_1_image = pygame.image.load("Textures/invisible_person.png")
+        picture_1_image_rect = picture_1_image.get_rect(center=(200, 150))
+        screen.blit(picture_1_image, picture_1_image_rect)
+    else:
+        picture_1_image = pygame.image.load("Textures/gallery_landay_picture.png")
+        picture_1_image_rect = picture_1_image.get_rect(center=(200, 150))
+        screen.blit(picture_1_image, picture_1_image_rect)
+
+    back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                         WIN_HEIGHT / 15, 'Back')
+    back_button.draw(screen)
+
+    pygame.display.update()
+
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if back_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = True
+                    is_gallery_menu = False
+                    run = False
+        return is_gallery_menu, is_menu, menu_music
 
 
 def pause_menu(bg, screen):
@@ -171,7 +225,8 @@ def game_over(bg, screen):
     :return:
     """
     global is_menu, running_1, is_game_over
-    pygame.mixer.music.stop()
+    pygame.mixer.music.load('Music/game_over.mp3')
+    pygame.mixer.music.play()
     screen.fill(Color(WHITE))
 
     restart_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
@@ -208,44 +263,60 @@ def game_over(bg, screen):
 
 
 def level_1(bg, screen):
-    global is_game_over, running_1, is_menu
+    """
 
-    pygame.mixer.music.load("chocolate-chip-by-uncle-morris.mp3")
+    :param bg:
+    :param screen:
+    :return:
+    """
+    global is_game_over, running_1, is_menu, is_landay
+
+    pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
     pygame.mixer.music.play(-1)
 
-    typical_enemy = Enemy(WIN_WIDTH / 7, WIN_HEIGHT / 2.65)
+    typical_enemy_1 = Enemy(WIN_WIDTH / 7, WIN_HEIGHT / 2.65)
+    typical_enemy_2 = Enemy(WIN_WIDTH / 1.2, WIN_HEIGHT / 5.6)
+    typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, WIN_HEIGHT / 3.8, 2)
+    typical_enemy_4 = Enemy(WIN_WIDTH / 1.535, WIN_HEIGHT / 1.29)
+
     hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию — стоим
     Up = False
+
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
     level_exits = []
     enemies = []
+    gallery_features = []
+
     entities.add(hero)
-    entities.add(typical_enemy)
-    enemies.append(typical_enemy)
+    entities.add(typical_enemy_1, typical_enemy_2, typical_enemy_3, typical_enemy_4)
+    enemies.append(typical_enemy_1)
+    enemies.append(typical_enemy_2)
+    enemies.append(typical_enemy_3)
+    enemies.append(typical_enemy_4)
 
     level = [
         "------------------------------------------------",
         "-                                               ",
-        "-                   ---           --           *",
-        "-                        -   --                 ",
-        "-            --                        --      -",
-        "-                    --      -   --            -",
-        "--                                       --    -",
-        "-            -              --                 -",
-        "-                     -               --       -",
+        "-                                              *",
+        "-                  --                           ",
+        "-             --                               -",
+        "-                       -        -             -",
+        "-                                      ----    -",
+        "-              -            --                 -",
+        "-                       -        -----         -",
         "-                                              -",
-        "-              -    --            --           -",
-        "-    -----                                     -",
-        "-                          --        -         -",
+        "-              -                               -",
+        "-    -----                            -        -",
+        "-                                              -",
         "-      --------                                -",
-        "-                                ---           -",
+        "-                                         -    -",
         "-                -                             -",
-        "-                   --          ------         -",
-        "-       ----                                   -",
-        "-                                    -----     -",
-        "-                      --                      -",
+        "-                   --                    c    -",
+        "-                                         -    -",
+        "-                                              -",
+        "-                      --            -         -",
         "-                                              -",
         "-                             ----             -",
         "-                                              -",
@@ -264,6 +335,11 @@ def level_1(bg, screen):
                 level_exit = Level_exit(x, y)
                 entities.add(level_exit)
                 level_exits.append(level_exit)
+            # if col == "c":
+            #     gallery_landay = "gallery_landay"
+            #     gallery_feature = Gallery_feature(x, y, gallery_landay)
+            #     entities.add(gallery_feature)
+            #     gallery_features.append(gallery_feature)
 
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
@@ -307,13 +383,20 @@ def level_1(bg, screen):
             if hero.health > 0:
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
-                typical_enemy.update()
+                typical_enemy_1.update()
+                typical_enemy_2.update()
+                typical_enemy_3.update(26)
+                typical_enemy_4.update(35)
                 entities.draw(screen)  # отображение
                 for e in level_exits:
                     if sprite.collide_rect(hero, e):
                         running_1 = 0
                         run = False
                         is_menu = True
+                # for g in gallery_features:
+                #     if sprite.collide_rect(hero, g):
+                #         is_landay = True
+                #         entities.remove(gallery_feature)
             elif hero.health <= 0:
                 is_game_over = True
                 run = False
@@ -326,7 +409,7 @@ def level_1(bg, screen):
         elif running_1 == 0:
             run = False
 
-    return is_game_over, running_1
+    return is_game_over, running_1, is_landay, is_menu
 
 
 def main():
@@ -334,8 +417,7 @@ def main():
     screen = pygame.display.set_mode(DISPLAY)
     # screen = pygame.display.set_mode(DISPLAY, pygame.DOUBLEBUF | pygame.OpenGL)  # Создаем окошко
     pygame.display.set_caption("SUPER FOPF BOY")  # Пишем в шапку
-    bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности,   будем использовать как фон
-    # running = False
+    bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности, будем использовать как фон
     # glClearColor(BACKGROUND_COLOR/255, 1)
     menu(bg, screen)
     runnin = True
@@ -345,7 +427,10 @@ def main():
                 menu(bg, screen)
         elif is_levels:
             while is_levels:
-                level_menu(screen)
+                level_menu(bg, screen)
+        elif is_gallery_menu:
+            while is_gallery_menu:
+                gallery_menu(bg, screen)
         elif running_1 != 0:
             while running_1:
                 level_1(bg, screen)

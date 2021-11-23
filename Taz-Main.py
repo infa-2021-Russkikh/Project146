@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import pygame
 from Player import *
 from Enemy import *
 from blocks import *
@@ -18,9 +17,10 @@ BACKGROUND_COLOR = "#004400"
 FPS = 60
 RED = (255, 0, 0)
 GREEN = (0, 155, 55)
-# PLATFORM_WIDTH = 32
-# PLATFORM_HEIGHT = 32
+# PLATFORM_WIDTH = WIN_WIDTH / 48
+# PLATFORM_HEIGHT = WIN_HEIGHT / 25.25
 # PLATFORM_COLOR = "#FF6262"
+
 is_game_over = False
 running_1 = 0
 is_pause_menu = False
@@ -37,14 +37,16 @@ def menu(bg, screen):
     :return:
     """
     global running_1, is_menu
+    pygame.mixer.music.load("menu_music.mp3")
+    pygame.mixer.music.play(-1)
     screen.fill(Color(GREEN))
 
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                              WIN_HEIGHT / 15, 'Start')
+                          WIN_HEIGHT / 15, 'Start')
     start_button.draw(screen)
 
     quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                              WIN_HEIGHT / 15, 'Quit')
+                         WIN_HEIGHT / 15, 'Quit')
     quit_button.draw(screen)
 
     pygame.display.update()
@@ -70,14 +72,21 @@ def menu(bg, screen):
 
 
 def pause_menu(bg, screen):
+    """
+
+    :param bg:
+    :param screen:
+    :return:
+    """
     global running_1, is_menu
+    pygame.mixer.music.pause()
 
     continue_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                          WIN_HEIGHT / 15, 'Continue')
+                             WIN_HEIGHT / 15, 'Continue')
     continue_button.draw(screen)
 
     menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
-                          WIN_HEIGHT / 15, 'Menu')
+                         WIN_HEIGHT / 15, 'Menu')
     menu_button.draw(screen)
 
     pygame.display.update()
@@ -103,18 +112,25 @@ def pause_menu(bg, screen):
 
 
 def game_over(bg, screen):
+    """
+
+    :param bg:
+    :param screen:
+    :return:
+    """
     global is_menu, running_1, is_game_over
+    pygame.mixer.music.stop()
     screen.fill(Color(WHITE))
 
-    restart_button = Button(RED, WIN_WIDTH/2 - WIN_WIDTH/6.2, WIN_HEIGHT/2 - WIN_HEIGHT/27, WIN_WIDTH/3.2,
-                              WIN_HEIGHT/15, 'Restart')
+    restart_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                            WIN_HEIGHT / 15, 'Restart')
     restart_button.draw(screen)
 
     menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Menu')
     menu_button.draw(screen)
 
-    game_over_text = Button(RED, WIN_WIDTH/2, WIN_HEIGHT/2 - WIN_HEIGHT/7, 0.1, 0.1, 'GAME OVER ^_^')
+    game_over_text = Button(RED, WIN_WIDTH / 2, WIN_HEIGHT / 2 - WIN_HEIGHT / 7, 0.1, 0.1, 'GAME OVER ^_^')
     game_over_text.draw(screen)
     pygame.display.update()
     run = True
@@ -141,6 +157,10 @@ def game_over(bg, screen):
 
 def level_1(bg, screen):
     global is_game_over, running_1
+
+    pygame.mixer.music.load("chocolate-chip-by-uncle-morris.mp3")
+    pygame.mixer.music.play(-1)
+
     typical_enemy = Enemy(WIN_WIDTH / 7, WIN_HEIGHT / 2.65)
     hero = Player(WIN_WIDTH / 35, WIN_HEIGHT / 19.6)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию — стоим
@@ -201,15 +221,27 @@ def level_1(bg, screen):
                     raise SystemExit("QUIT")
                 if event.type == KEYDOWN and event.key == K_UP:
                     up = True
+                if event.type == KEYDOWN and event.key == K_w:
+                    up = True
                 if event.type == KEYUP and event.key == K_UP:
+                    up = False
+                if event.type == KEYUP and event.key == K_w:
                     up = False
                 if event.type == KEYDOWN and event.key == K_LEFT:
                     left = True
+                if event.type == KEYDOWN and event.key == K_a:
+                    left = True
                 if event.type == KEYDOWN and event.key == K_RIGHT:
+                    right = True
+                if event.type == KEYDOWN and event.key == K_d:
                     right = True
                 if event.type == KEYUP and event.key == K_RIGHT:
                     right = False
+                if event.type == KEYUP and event.key == K_d:
+                    right = False
                 if event.type == KEYUP and event.key == K_LEFT:
+                    left = False
+                if event.type == KEYUP and event.key == K_a:
                     left = False
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
                     running_1 = 2

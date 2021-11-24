@@ -33,9 +33,8 @@ class Level_exit(sprite.Sprite):
         self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
 
 
-# class Gallery_feature(sprite.Sprite):
-#     def __init__(self, x, y, feature_image):
-#         sprite.Sprite.__init__(self)
-#         self.image = Surface(PLATFORM_WIDTH, PLATFORM_HEIGHT)
-#         self.image = image.load(f"%s/Textures/{feature_image}.png" % ICON_DIR)
-#         self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+class Gallery_feature(sprite.Sprite):
+    def __init__(self, x, y, feature_image):
+        sprite.Sprite.__init__(self)
+        self.image = image.load(f"%s/Textures/{feature_image}.png" % ICON_DIR)
+        self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)

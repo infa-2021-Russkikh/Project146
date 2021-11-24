@@ -60,7 +60,7 @@ def menu(bg, screen):
 
     gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                            WIN_HEIGHT / 15, 'Gallery')
-    # gallery_button.draw(screen)
+    gallery_button.draw(screen)
 
     quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Quit')
@@ -90,11 +90,11 @@ def menu(bg, screen):
                     menu_music = True
                     is_levels = True
                     run = False
-                # if gallery_button.is_pressed(mouse_pos, mouse_pressed):
-                #     is_menu = False
-                #     menu_music = True
-                #     is_gallery_menu = True
-                #     run = False
+                if gallery_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = False
+                    menu_music = True
+                    is_gallery_menu = True
+                    run = False
     pygame.display.update()
     return running_1, is_menu
 
@@ -283,6 +283,8 @@ def level_1(bg, screen):
     left = right = False  # по умолчанию — стоим
     Up = False
 
+    landay = False
+
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
     level_exits = []
@@ -335,11 +337,12 @@ def level_1(bg, screen):
                 level_exit = Level_exit(x, y)
                 entities.add(level_exit)
                 level_exits.append(level_exit)
-            # if col == "c":
-            #     gallery_landay = "gallery_landay"
-            #     gallery_feature = Gallery_feature(x, y, gallery_landay)
-            #     entities.add(gallery_feature)
-            #     gallery_features.append(gallery_feature)
+            if not is_landay:
+                if col == "c":
+                    gallery_landay = "gallery_landay"
+                    gallery_feature = Gallery_feature(x, y, gallery_landay)
+                    entities.add(gallery_feature)
+                    gallery_features.append(gallery_feature)
 
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
@@ -388,15 +391,21 @@ def level_1(bg, screen):
                 typical_enemy_3.update(26)
                 typical_enemy_4.update(35)
                 entities.draw(screen)  # отображение
+
                 for e in level_exits:
                     if sprite.collide_rect(hero, e):
+
+                        if landay:
+                            is_landay = True
+
                         running_1 = 0
                         run = False
                         is_menu = True
-                # for g in gallery_features:
-                #     if sprite.collide_rect(hero, g):
-                #         is_landay = True
-                #         entities.remove(gallery_feature)
+                for g in gallery_features:
+                    if sprite.collide_rect(hero, g):
+                        entities.remove(gallery_feature)
+                        landay = True
+                        # print(gallery_achieve_count)
             elif hero.health <= 0:
                 is_game_over = True
                 run = False

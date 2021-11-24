@@ -8,7 +8,6 @@ from buttones import *
 # from OpenGL.GLU import *
 import ctypes
 import json
-# import os
 
 # Объявляем переменные
 user32 = ctypes.windll.user32
@@ -19,6 +18,7 @@ BACKGROUND_COLOR = "#004400"
 FPS = 60
 RED = (255, 0, 0)
 GREEN = (0, 155, 55)
+GREY = (50, 50, 50)
 # PLATFORM_WIDTH = WIN_WIDTH / 48
 # PLATFORM_HEIGHT = WIN_HEIGHT / 25.25
 # PLATFORM_COLOR = "#FF6262"
@@ -26,9 +26,11 @@ GREEN = (0, 155, 55)
 with open("saves.json", 'r') as f:
     dict = json.load(f)
 
-Number_of_level = 1
+Number_of_level = 0
 gallery_pictures = []
+amount_passed_levels = dict["amount_passed_levels"]
 is_landay = dict["is_landay"]
+is_einstein = dict["is_einstein"]
 gallery_pictures.append(is_landay)
 is_menu = False
 is_options_menu = False
@@ -37,17 +39,8 @@ menu_music = False
 is_levels = False
 is_game_over = False
 running_1 = 0
+running_2 = 0
 is_pause_menu = False
-
-
-# def get_data():
-#     with open("saves.json", "wb") as fp:
-#         pickle.dump(gallery_pictures, fp)
-#
-#
-# def saves_data():
-#     with open("saves.json", "rb") as fp:
-#         gallery_pictures = pickle.load(fp)
 
 up = False
 timer = pygame.time.Clock()
@@ -81,7 +74,7 @@ def menu(bg, screen):
     options_button.draw(screen)
 
     gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                           WIN_HEIGHT / 15, 'Gallery')
+                            WIN_HEIGHT / 15, 'Gallery')
     gallery_button.draw(screen)
 
     quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
@@ -132,7 +125,7 @@ def level_menu(bg, screen):
     :param screen:
     :return:
     """
-    global is_menu, running_1, is_levels
+    global is_menu, running_1, running_2, is_levels, amount_passed_levels
 
     bg = pygame.image.load("Textures/additional task.png")
     screen.blit(bg, (0, 0))
@@ -141,6 +134,19 @@ def level_menu(bg, screen):
     level_1_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 3 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                             WIN_HEIGHT / 15, 'Level 1')
     level_1_button.draw(screen)
+
+    if amount_passed_levels < 1:
+        level_2_button = Button(GREY, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27,
+                                WIN_WIDTH / 3.2,
+                                WIN_HEIGHT / 15, 'Level 2')
+
+        cannot_button = Button(GREY, WIN_WIDTH / 2, WIN_HEIGHT / 2 - WIN_HEIGHT / 29, 0.1, 0.1,
+                               'Firstly, pass all previous levels')
+    else:
+        level_2_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27,
+                                WIN_WIDTH / 3.2,
+                                WIN_HEIGHT / 15, 'Level 2')
+    level_2_button.draw(screen)
 
     back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Back')
@@ -161,6 +167,14 @@ def level_menu(bg, screen):
                     running_1 = True
                     is_levels = False
                     run = False
+                if level_2_button.is_pressed(mouse_pos, mouse_pressed):
+                    if amount_passed_levels < 1:
+                        cannot_button.draw(screen, RED)
+                        pygame.display.update()
+                    else:
+                        running_2 = True
+                        is_levels = False
+                        run = False
                 if back_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = True
                     is_levels = False
@@ -180,6 +194,15 @@ def gallery_menu(bg, screen):
         picture_1_image = pygame.image.load("Textures/gallery_landay_picture.png")
         picture_1_image_rect = picture_1_image.get_rect(center=(200, 150))
         screen.blit(picture_1_image, picture_1_image_rect)
+
+    if not is_einstein:
+        picture_2_image = pygame.image.load("Textures/invisible_person.png")
+        picture_2_image_rect = picture_2_image.get_rect(center=(500, 150))
+        screen.blit(picture_2_image, picture_2_image_rect)
+    else:
+        picture_2_image = pygame.image.load("Textures/gallery_einstein_picture.png")
+        picture_2_image_rect = picture_2_image.get_rect(center=(500, 150))
+        screen.blit(picture_2_image, picture_2_image_rect)
 
     back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Back')
@@ -204,7 +227,7 @@ def gallery_menu(bg, screen):
 
 
 def options_menu(bg, screen):
-    global is_menu, menu_music, is_options_menu, is_landay, dict
+    global is_menu, menu_music, is_options_menu, is_landay, dict, amount_passed_levels
 
     screen.fill(Color(GREEN))
 
@@ -230,7 +253,9 @@ def options_menu(bg, screen):
                     is_options_menu = False
                     run = False
                 if reset_progress_button.is_pressed(mouse_pos, mouse_pressed):
+                    amount_passed_levels = 0
                     is_landay = 0
+                    dict["amount_passed_levels"] = 0
                     dict["is_landay"] = 0
                     with open("saves.json", 'w') as f:
                         json.dump(dict, f)
@@ -238,7 +263,7 @@ def options_menu(bg, screen):
                         dict = json.load(f)
 
         pygame.display.update()
-        return is_options_menu, is_menu, menu_music, is_landay
+        return is_options_menu, is_menu, menu_music, is_landay, amount_passed_levels
 
 
 def pause_menu(bg, screen):
@@ -248,7 +273,7 @@ def pause_menu(bg, screen):
     :param screen:
     :return:
     """
-    global running_1, is_menu
+    global running_1, is_menu, Number_of_level, running_2, menu_music
     pygame.mixer.music.pause()
 
     continue_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
@@ -271,11 +296,16 @@ def pause_menu(bg, screen):
                 mouse_pos = pygame.mouse.get_pos()
                 mouse_pressed = pygame.mouse.get_pressed()
                 if continue_button.is_pressed(mouse_pos, mouse_pressed):
-                    running_1 = 1
+                    if Number_of_level == 1:
+                        running_1 = 1
+                    elif Number_of_level == 2:
+                        running_2 = 1
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = True
                     running_1 = 0
+                    running_2 = 0
+                    menu_music = False
                     run = False
         pygame.display.update()
     pygame.mixer.music.unpause()
@@ -289,7 +319,7 @@ def game_over(bg, screen):
     :param screen:
     :return:
     """
-    global is_menu, running_1, is_game_over
+    global is_menu, running_1, is_game_over, running_2, Number_of_level
     pygame.mixer.music.load('Music/game_over.mp3')
     pygame.mixer.music.play()
     screen.fill(Color(WHITE))
@@ -316,7 +346,10 @@ def game_over(bg, screen):
                 mouse_pressed = pygame.mouse.get_pressed()
                 if restart_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = False
-                    running_1 = True
+                    if Number_of_level == 1:
+                        running_1 = 1
+                    elif Number_of_level == 2:
+                        running_2 = 1
                     is_game_over = False
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
@@ -334,7 +367,8 @@ def level_1(bg, screen):
     :param screen:
     :return:
     """
-    global is_game_over, running_1, is_menu, is_landay, menu_music
+    global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels
+    Number_of_level = 1
 
     pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
     pygame.mixer.music.play(-1)
@@ -371,16 +405,16 @@ def level_1(bg, screen):
         "-             --                               -",
         "-                       -        -             -",
         "-                                      ----    -",
-        "-              -            --                 -",
+        "-              -        c   --                 -",
         "-                       -        -----         -",
         "-                                              -",
         "-              -                               -",
         "-    -----                            -        -",
         "-                                              -",
-        "-      --------                                -",
+        "-          ----                                -",
         "-                                         -    -",
         "-                -                             -",
-        "-                   --                    c    -",
+        "-                   --                         -",
         "-                                         -    -",
         "-                                              -",
         "-                      --            -         -",
@@ -399,13 +433,13 @@ def level_1(bg, screen):
                 entities.add(pf)
                 platforms.append(pf)
             if col == "*":
-                level_exit = Level_exit(x, y)
+                level_exit = Platform(x, y, "exit_door")
                 entities.add(level_exit)
                 level_exits.append(level_exit)
             if not is_landay:
                 if col == "c":
                     gallery_landay = "gallery_landay"
-                    gallery_feature = Gallery_feature(x, y, gallery_landay)
+                    gallery_feature = Platform(x, y, gallery_landay)
                     entities.add(gallery_feature)
                     gallery_features.append(gallery_feature)
 
@@ -459,13 +493,13 @@ def level_1(bg, screen):
 
                 for e in level_exits:
                     if sprite.collide_rect(hero, e):
-
+                        amount_passed_levels = 1
+                        dict["amount_passed_levels"] = 1
                         if landay:
                             is_landay = 1
                             dict["is_landay"] = 1
                             with open("saves.json", 'w') as f:
                                 json.dump(dict, f)
-
                         menu_music = False
                         running_1 = 0
                         run = False
@@ -486,7 +520,181 @@ def level_1(bg, screen):
         elif running_1 == 0:
             run = False
 
-    return is_game_over, running_1, is_landay, is_menu, menu_music
+    return is_game_over, running_1, is_landay, is_menu, menu_music, Number_of_level, amount_passed_levels
+
+
+def level_2(bg, screen):
+    """
+
+    :param bg:
+    :param screen:
+    :return:
+    """
+    global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level
+    Number_of_level = 2
+
+    pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
+    pygame.mixer.music.play(-1)
+
+    typical_enemy_1 = Enemy(WIN_WIDTH / 6.5, WIN_HEIGHT - PLATFORM_HEIGHT * 2.78)
+    typical_enemy_2 = Enemy(WIN_WIDTH / 1.2, WIN_HEIGHT / 5.6)
+    typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, WIN_HEIGHT / 3.8, 2)
+    typical_enemy_4 = Enemy(WIN_WIDTH / 1.535, WIN_HEIGHT / 1.29)
+
+    hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
+    left = right = False  # по умолчанию — стоим
+    Up = False
+
+    einstein = False
+
+    entities = pygame.sprite.Group()  # Все объекты
+    platforms = []  # то, во что мы будем врезаться или опираться
+    level_exits = []
+    enemies = []
+    lavas = []
+    gallery_features = []
+
+    entities.add(hero)
+    entities.add(typical_enemy_1, typical_enemy_2, typical_enemy_3, typical_enemy_4)
+    enemies.append(typical_enemy_1)
+    enemies.append(typical_enemy_2)
+    enemies.append(typical_enemy_3)
+    enemies.append(typical_enemy_4)
+
+    level = [
+        "------------------------------------------------",
+        "-                                               ",
+        "-                                              *",
+        "-      -           -       -      -      -      ",
+        "-                                              -",
+        "--            -                                -",
+        "-                                              -",
+        "-                                              -",
+        "-             -                                -",
+        "-                                              -",
+        "-                   -                          -",
+        "-                                              -",
+        "-                          -                   -",
+        "-                                              -",
+        "-                                 -            -",
+        "-                                              -",
+        "                                         ---   -",
+        "--------------                                 -",
+        "/                                              -",
+        " ----                                    ---   -",
+        "-    ---                                       -",
+        "-       ---                                    -",
+        "-          ---                     ---         -",
+        "-                      ---    --               -",
+        "-------------------____________________________-"]
+
+    x = y = 0  # координаты
+    for row in level:  # вся строка
+        for col in row:  # каждый символ
+            if col == "-":
+                # создаем блок, заливаем его цветом и рисуем его
+                pf = Platform(x, y)
+                entities.add(pf)
+                platforms.append(pf)
+            if col == "/":
+                level_exit = Platform(x, y, "exit_door")
+                entities.add(level_exit)
+            if col == "*":
+                level_exit = Platform(x, y, "exit_door_2")
+                entities.add(level_exit)
+                level_exits.append(level_exit)
+            if col == "_":
+                lava = Platform(x, y, "lava")
+                entities.add(lava)
+                lavas.append(lava)
+            if not is_einstein:
+                if col == "c":
+                    gallery_einstein = "gallery_einstein"
+                    gallery_feature = Platform(x, y, gallery_einstein)
+                    entities.add(gallery_feature)
+                    gallery_features.append(gallery_feature)
+
+            x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
+        y += PLATFORM_HEIGHT  # то же самое и с высотой
+        x = 0
+
+    run = True
+    while run:
+        timer.tick(FPS)
+        if running_2 == 1:
+            for event in pygame.event.get():  # Обрабатываем события
+                if event.type == QUIT:
+                    raise SystemExit("QUIT")
+                if event.type == KEYDOWN and event.key == K_UP:
+                    Up = True
+                if event.type == KEYDOWN and event.key == K_w:
+                    Up = True
+                if event.type == KEYUP and event.key == K_UP:
+                    Up = False
+                if event.type == KEYUP and event.key == K_w:
+                    Up = False
+                if event.type == KEYDOWN and event.key == K_LEFT:
+                    left = True
+                if event.type == KEYDOWN and event.key == K_a:
+                    left = True
+                if event.type == KEYDOWN and event.key == K_RIGHT:
+                    right = True
+                if event.type == KEYDOWN and event.key == K_d:
+                    right = True
+                if event.type == KEYUP and event.key == K_RIGHT:
+                    right = False
+                if event.type == KEYUP and event.key == K_d:
+                    right = False
+                if event.type == KEYUP and event.key == K_LEFT:
+                    left = False
+                if event.type == KEYUP and event.key == K_a:
+                    left = False
+                if event.type == KEYDOWN and event.key == K_ESCAPE:
+                    running_2 = 2
+
+            hero.collide_enemy(enemies, hero)
+            if hero.health > 0:
+                screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
+                hero.update(left, right, Up, platforms)  # передвижение
+                typical_enemy_1.update()
+                typical_enemy_2.update()
+                typical_enemy_3.update(26)
+                typical_enemy_4.update(35)
+                entities.draw(screen)  # отображение
+
+                for e in level_exits:
+                    if sprite.collide_rect(hero, e):
+
+                        if einstein:
+                            is_einstein = 1
+                            dict["is_einstein"] = 1
+                            with open("saves.json", 'w') as f:
+                                json.dump(dict, f)
+
+                        menu_music = False
+                        running_2 = 0
+                        run = False
+                        is_menu = True
+                for g in gallery_features:
+                    if sprite.collide_rect(hero, g):
+                        entities.remove(gallery_feature)
+                        einstein = True
+                for l in lavas:
+                    if sprite.collide_rect(hero, l):
+                        hero.health = 0
+            elif hero.health <= 0:
+                is_game_over = True
+                run = False
+                running_2 = 0
+                game_over(bg, screen)
+            pygame.display.update()  # обновление и вывод всех изменений на экран
+        elif running_2 == 2:
+            while running_2 == 2:
+                pause_menu(bg, screen)
+        elif running_2 == 0:
+            run = False
+
+    return is_game_over, running_2, is_einstein, is_menu, menu_music
 
 
 def main():
@@ -515,11 +723,13 @@ def main():
         elif running_1 != 0:
             while running_1:
                 level_1(bg, screen)
+        elif running_2 != 0:
+            while running_2:
+                level_2(bg, screen)
         elif is_game_over:
             while is_game_over:
                 game_over(bg, screen)
         else:
-            # saves_data()
             runnin = False
 
 

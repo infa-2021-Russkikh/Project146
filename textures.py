@@ -3,6 +3,7 @@
 # from pygame.rect import Rect
 # from pygame.surface import Surface
 import os
+
 from pygame import *
 import ctypes
 
@@ -18,23 +19,8 @@ ICON_DIR = os.path.dirname(__file__)  # Полный путь к каталог�
 
 
 class Platform(sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, texture="platform", platform_height=PLATFORM_HEIGHT):
         sprite.Sprite.__init__(self)
-        self.image = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-        self.image = image.load("%s/Textures/platform.png" % ICON_DIR)
-        self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
-
-
-class Level_exit(sprite.Sprite):
-    def __init__(self, x, y):
-        sprite.Sprite.__init__(self)
-        self.image = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-        self.image = image.load("%s/Textures/exit_door.png" % ICON_DIR)
-        self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
-
-
-class Gallery_feature(sprite.Sprite):
-    def __init__(self, x, y, feature_image):
-        sprite.Sprite.__init__(self)
-        self.image = image.load(f"%s/Textures/{feature_image}.png" % ICON_DIR)
-        self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+        self.image = Surface((PLATFORM_WIDTH, platform_height))
+        self.image = image.load(f"%s/Textures/{texture}.png" % ICON_DIR)
+        self.rect = Rect(x, y, PLATFORM_WIDTH, platform_height)

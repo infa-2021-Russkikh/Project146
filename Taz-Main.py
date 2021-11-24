@@ -466,7 +466,7 @@ def level_1(bg, screen):
                             with open("saves.json", 'w') as f:
                                 json.dump(dict, f)
 
-                        menu_music = True
+                        menu_music = False
                         running_1 = 0
                         run = False
                         is_menu = True
@@ -497,8 +497,6 @@ def main():
     bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности, будем использовать как фон
     # glClearColor(BACKGROUND_COLOR/255, 1)
 
-    # get_data()
-
     menu(bg, screen)
     runnin = True
     while runnin:
@@ -521,7 +519,6 @@ def main():
             while is_game_over:
                 game_over(bg, screen)
         else:
-            # saves_data()
             runnin = False
 
 

@@ -7,6 +7,7 @@ from buttones import *
 # from OpenGL.GL import *
 # from OpenGL.GLU import *
 import ctypes
+import json
 # import os
 
 # Объявляем переменные
@@ -22,14 +23,31 @@ GREEN = (0, 155, 55)
 # PLATFORM_HEIGHT = WIN_HEIGHT / 25.25
 # PLATFORM_COLOR = "#FF6262"
 
+with open("saves.json", 'r') as f:
+    dict = json.load(f)
+
 Number_of_level = 1
-is_landay = False
+gallery_pictures = []
+is_landay = dict["is_landay"]
+gallery_pictures.append(is_landay)
+is_menu = False
+is_options_menu = False
 is_gallery_menu = False
 menu_music = False
 is_levels = False
 is_game_over = False
 running_1 = 0
 is_pause_menu = False
+
+
+# def get_data():
+#     with open("saves.json", "wb") as fp:
+#         pickle.dump(gallery_pictures, fp)
+#
+#
+# def saves_data():
+#     with open("saves.json", "rb") as fp:
+#         gallery_pictures = pickle.load(fp)
 
 up = False
 timer = pygame.time.Clock()
@@ -42,11 +60,11 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global running_1, is_menu, is_levels, menu_music, is_gallery_menu
+    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu
     if not menu_music:
         pygame.mixer.music.load("Music/menu_music.mp3")
         pygame.mixer.music.play(-1)
-    bg = pygame.image.load("additional task.png")
+    bg = pygame.image.load("Textures/additional task.png")
     screen.blit(bg, (0, 0))
     # screen.fill(Color(GREEN))
 
@@ -58,11 +76,15 @@ def menu(bg, screen):
                            WIN_HEIGHT / 15, 'Levels')
     levels_button.draw(screen)
 
-    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+    options_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                            WIN_HEIGHT / 15, 'Options')
+    options_button.draw(screen)
+
+    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                            WIN_HEIGHT / 15, 'Gallery')
     gallery_button.draw(screen)
 
-    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Quit')
     quit_button.draw(screen)
 
@@ -95,8 +117,13 @@ def menu(bg, screen):
                     menu_music = True
                     is_gallery_menu = True
                     run = False
+                if options_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = False
+                    menu_music = True
+                    is_options_menu = True
+                    run = False
     pygame.display.update()
-    return running_1, is_menu
+    return running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu
 
 
 def level_menu(bg, screen):
@@ -107,7 +134,7 @@ def level_menu(bg, screen):
     """
     global is_menu, running_1, is_levels
 
-    bg = pygame.image.load("additional task.png")
+    bg = pygame.image.load("Textures/additional task.png")
     screen.blit(bg, (0, 0))
     # screen.fill(Color(GREEN))
 
@@ -174,6 +201,44 @@ def gallery_menu(bg, screen):
                     is_gallery_menu = False
                     run = False
         return is_gallery_menu, is_menu, menu_music
+
+
+def options_menu(bg, screen):
+    global is_menu, menu_music, is_options_menu, is_landay, dict
+
+    screen.fill(Color(GREEN))
+
+    back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                         WIN_HEIGHT / 15, 'Back')
+    back_button.draw(screen)
+
+    reset_progress_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27,
+                                   WIN_WIDTH / 3.2, WIN_HEIGHT / 15, 'Reset progress')
+    reset_progress_button.draw(screen)
+
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if back_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = True
+                    is_options_menu = False
+                    run = False
+                if reset_progress_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_landay = 0
+                    dict["is_landay"] = 0
+                    with open("saves.json", 'w') as f:
+                        json.dump(dict, f)
+                    with open("saves.json", 'r') as f:
+                        dict = json.load(f)
+
+        pygame.display.update()
+        return is_options_menu, is_menu, menu_music, is_landay
 
 
 def pause_menu(bg, screen):
@@ -269,7 +334,7 @@ def level_1(bg, screen):
     :param screen:
     :return:
     """
-    global is_game_over, running_1, is_menu, is_landay
+    global is_game_over, running_1, is_menu, is_landay, menu_music
 
     pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
     pygame.mixer.music.play(-1)
@@ -396,8 +461,12 @@ def level_1(bg, screen):
                     if sprite.collide_rect(hero, e):
 
                         if landay:
-                            is_landay = True
+                            is_landay = 1
+                            dict["is_landay"] = 1
+                            with open("saves.json", 'w') as f:
+                                json.dump(dict, f)
 
+                        menu_music = True
                         running_1 = 0
                         run = False
                         is_menu = True
@@ -405,7 +474,6 @@ def level_1(bg, screen):
                     if sprite.collide_rect(hero, g):
                         entities.remove(gallery_feature)
                         landay = True
-                        # print(gallery_achieve_count)
             elif hero.health <= 0:
                 is_game_over = True
                 run = False
@@ -418,7 +486,7 @@ def level_1(bg, screen):
         elif running_1 == 0:
             run = False
 
-    return is_game_over, running_1, is_landay, is_menu
+    return is_game_over, running_1, is_landay, is_menu, menu_music
 
 
 def main():
@@ -428,6 +496,9 @@ def main():
     pygame.display.set_caption("SUPER FOPF BOY")  # Пишем в шапку
     bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности, будем использовать как фон
     # glClearColor(BACKGROUND_COLOR/255, 1)
+
+    # get_data()
+
     menu(bg, screen)
     runnin = True
     while runnin:
@@ -440,6 +511,9 @@ def main():
         elif is_gallery_menu:
             while is_gallery_menu:
                 gallery_menu(bg, screen)
+        elif is_options_menu:
+            while is_options_menu:
+                options_menu(bg, screen)
         elif running_1 != 0:
             while running_1:
                 level_1(bg, screen)
@@ -447,6 +521,7 @@ def main():
             while is_game_over:
                 game_over(bg, screen)
         else:
+            # saves_data()
             runnin = False
 
 

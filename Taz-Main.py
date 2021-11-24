@@ -289,7 +289,7 @@ def game_over(bg, screen):
     :param screen:
     :return:
     """
-    global is_menu, running_1, is_game_over, menu_music
+    global is_menu, running_1, is_game_over
     pygame.mixer.music.load('Music/game_over.mp3')
     pygame.mixer.music.play()
     screen.fill(Color(WHITE))
@@ -321,11 +321,10 @@ def game_over(bg, screen):
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = True
-                    menu_music = False
                     is_game_over = False
                     run = False
     pygame.display.update()
-    return is_menu, running_1, is_game_over,  menu_music
+    return is_menu, running_1, is_game_over
 
 
 def level_1(bg, screen):
@@ -520,6 +519,7 @@ def main():
             while is_game_over:
                 game_over(bg, screen)
         else:
+            # saves_data()
             runnin = False
 
 

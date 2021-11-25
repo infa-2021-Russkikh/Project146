@@ -563,7 +563,7 @@ def level_2(bg, screen):
     Number_of_level = 2
 
     pygame.mixer.music.set_volume(dict["music_volume"])
-    pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
+    pygame.mixer.music.load("Music/Office_Passenger_Dirty_Love.mp3")
     pygame.mixer.music.play(-1)
 
     typical_enemy_1 = Enemy(PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 23, 3)

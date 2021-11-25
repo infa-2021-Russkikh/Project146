@@ -774,7 +774,7 @@ def level_2(bg, screen):
                         bullets_1.remove(bullet_1)
 
                 if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
-                    bullet_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 6, 10, "bomb")
+                    bullet_2 = Enemy(PLATFORM_WIDTH * 9, PLATFORM_HEIGHT * 7, 10, "bomb")
                     bullets_2.append(bullet_2)
                     enemies.append(bullet_2)
                     entities.add(bullet_2)

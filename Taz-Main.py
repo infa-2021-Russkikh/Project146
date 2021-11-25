@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import Level_1
 from Player import *
 from Enemy import *
 from textures import *
 from buttones import *
 # from OpenGL.GL import *
 # from OpenGL.GLU import *
+import datetime
 import ctypes
 import json
 
@@ -26,6 +28,7 @@ GREY = (50, 50, 50)
 with open("saves.json", 'r') as f:
     dict = json.load(f)
 
+music_volume = dict["music_volume"]
 Number_of_level = 0
 gallery_pictures = []
 amount_passed_levels = dict["amount_passed_levels"]
@@ -53,13 +56,14 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu
+    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict
     if not menu_music:
+        pygame.mixer.music.set_volume(dict["music_volume"])
         pygame.mixer.music.load("Music/menu_music.mp3")
         pygame.mixer.music.play(-1)
     bg = pygame.image.load("Textures/additional task.png")
-    screen.blit(bg, (0, 0))
-    # screen.fill(Color(GREEN))
+    # screen.blit(bg, (0, 0))
+    screen.fill(Color(GREEN))
 
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                           WIN_HEIGHT / 15, 'Start')
@@ -128,8 +132,8 @@ def level_menu(bg, screen):
     global is_menu, running_1, running_2, is_levels, amount_passed_levels
 
     bg = pygame.image.load("Textures/additional task.png")
-    screen.blit(bg, (0, 0))
-    # screen.fill(Color(GREEN))
+    # screen.blit(bg, (0, 0))
+    screen.fill(Color(GREEN))
 
     level_1_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 3 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                             WIN_HEIGHT / 15, 'Level 1')
@@ -235,6 +239,14 @@ def options_menu(bg, screen):
                          WIN_HEIGHT / 15, 'Back')
     back_button.draw(screen)
 
+    music_off_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                              WIN_HEIGHT / 15, 'Music off')
+    music_off_button.draw(screen)
+
+    music_on_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                             WIN_HEIGHT / 15, 'Music on')
+    music_on_button.draw(screen)
+
     reset_progress_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27,
                                    WIN_WIDTH / 3.2, WIN_HEIGHT / 15, 'Reset progress')
     reset_progress_button.draw(screen)
@@ -252,6 +264,20 @@ def options_menu(bg, screen):
                     is_menu = True
                     is_options_menu = False
                     run = False
+                if music_off_button.is_pressed(mouse_pos, mouse_pressed):
+                    pygame.mixer.music.set_volume(0)
+                    dict["music_volume"] = 0
+                    with open("saves.json", 'w') as f:
+                        json.dump(dict, f)
+                    with open("saves.json", 'r') as f:
+                        dict = json.load(f)
+                if music_on_button.is_pressed(mouse_pos, mouse_pressed):
+                    pygame.mixer.music.set_volume(1)
+                    dict["music_volume"] = 1
+                    with open("saves.json", 'w') as f:
+                        json.dump(dict, f)
+                    with open("saves.json", 'r') as f:
+                        dict = json.load(f)
                 if reset_progress_button.is_pressed(mouse_pos, mouse_pressed):
                     amount_passed_levels = 0
                     is_landay = 0
@@ -319,7 +345,8 @@ def game_over(bg, screen):
     :param screen:
     :return:
     """
-    global is_menu, running_1, is_game_over, running_2, Number_of_level
+    global is_menu, running_1, is_game_over, running_2, Number_of_level, dict, menu_music
+    pygame.mixer.music.set_volume(dict["music_volume"])
     pygame.mixer.music.load('Music/game_over.mp3')
     pygame.mixer.music.play()
     screen.fill(Color(WHITE))
@@ -328,7 +355,7 @@ def game_over(bg, screen):
                             WIN_HEIGHT / 15, 'Restart')
     restart_button.draw(screen)
 
-    menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
+    menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Menu')
     menu_button.draw(screen)
 
@@ -354,10 +381,11 @@ def game_over(bg, screen):
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = True
+                    menu_music = False
                     is_game_over = False
                     run = False
     pygame.display.update()
-    return is_menu, running_1, is_game_over
+    return is_menu, running_1, is_game_over, menu_music
 
 
 def level_1(bg, screen):
@@ -367,16 +395,17 @@ def level_1(bg, screen):
     :param screen:
     :return:
     """
-    global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels
+    global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels, dict
     Number_of_level = 1
 
+    pygame.mixer.music.set_volume(dict["music_volume"])
     pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
     pygame.mixer.music.play(-1)
 
-    typical_enemy_1 = Enemy(WIN_WIDTH / 7, WIN_HEIGHT / 2.65)
-    typical_enemy_2 = Enemy(WIN_WIDTH / 1.2, WIN_HEIGHT / 5.6)
-    typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, WIN_HEIGHT / 3.8, 2)
-    typical_enemy_4 = Enemy(WIN_WIDTH / 1.535, WIN_HEIGHT / 1.29)
+    typical_enemy_1 = Enemy(WIN_WIDTH / 7, PLATFORM_HEIGHT*10)
+    typical_enemy_2 = Enemy(WIN_WIDTH - PLATFORM_WIDTH*7.5, PLATFORM_HEIGHT*5)
+    typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, PLATFORM_HEIGHT * 7, 2)
+    typical_enemy_4 = Enemy(WIN_WIDTH / 1.535, PLATFORM_HEIGHT * 20)
 
     hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию — стоим
@@ -498,8 +527,8 @@ def level_1(bg, screen):
                         if landay:
                             is_landay = 1
                             dict["is_landay"] = 1
-                            with open("saves.json", 'w') as f:
-                                json.dump(dict, f)
+                        with open("saves.json", 'w') as f:
+                            json.dump(dict, f)
                         menu_music = False
                         running_1 = 0
                         run = False
@@ -530,16 +559,25 @@ def level_2(bg, screen):
     :param screen:
     :return:
     """
-    global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level
+    global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level, dict
     Number_of_level = 2
 
+    pygame.mixer.music.set_volume(dict["music_volume"])
     pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
     pygame.mixer.music.play(-1)
 
-    typical_enemy_1 = Enemy(WIN_WIDTH / 6.5, WIN_HEIGHT - PLATFORM_HEIGHT * 2.78)
-    typical_enemy_2 = Enemy(WIN_WIDTH / 1.2, WIN_HEIGHT / 5.6)
-    typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, WIN_HEIGHT / 3.8, 2)
-    typical_enemy_4 = Enemy(WIN_WIDTH / 1.535, WIN_HEIGHT / 1.29)
+    typical_enemy_1 = Enemy(PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 23, 3)
+    typical_enemy_2 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 8, PLATFORM_HEIGHT * 3, 2)
+    typical_enemy_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 13, PLATFORM_HEIGHT * 3)
+    typical_enemy_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 18, PLATFORM_HEIGHT * 3, 2)
+    typical_enemy_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 22, PLATFORM_HEIGHT * 3)
+    typical_enemy_6 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 27, PLATFORM_HEIGHT * 3, 4)
+    typical_enemy_7 = Enemy(PLATFORM_WIDTH * 30.5, PLATFORM_HEIGHT * 22)
+    archer_enemy_1 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 5, enemy_image="enemy_2")
+    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 6, enemy_image="enemy_2")
+    archer_enemy_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 7, enemy_image="enemy_2_straight")
+    archer_enemy_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 11, enemy_image="enemy_2")
+    archer_enemy_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, enemy_image="enemy_2_90")
 
     hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию — стоим
@@ -549,78 +587,118 @@ def level_2(bg, screen):
 
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
+    passes_in_level = []
     level_exits = []
     enemies = []
+    bullets_1 = []
+    bullets_2 = []
+    bullets_3 = []
+    bullets_4 = []
+    bullets_5 = []
     lavas = []
     gallery_features = []
 
+    date_time_obj1 = datetime.datetime.now()
+
     entities.add(hero)
-    entities.add(typical_enemy_1, typical_enemy_2, typical_enemy_3, typical_enemy_4)
+    entities.add(typical_enemy_1, typical_enemy_2, typical_enemy_3, typical_enemy_4, typical_enemy_5, typical_enemy_6,
+                 typical_enemy_7, archer_enemy_1, archer_enemy_2, archer_enemy_3, archer_enemy_4, archer_enemy_5)
     enemies.append(typical_enemy_1)
     enemies.append(typical_enemy_2)
     enemies.append(typical_enemy_3)
     enemies.append(typical_enemy_4)
+    enemies.append(typical_enemy_5)
+    enemies.append(typical_enemy_6)
+    enemies.append(typical_enemy_7)
+    enemies.append(archer_enemy_1)
+    enemies.append(archer_enemy_2)
+    enemies.append(archer_enemy_3)
+    enemies.append(archer_enemy_4)
+    enemies.append(archer_enemy_5)
 
-    level = [
-        "------------------------------------------------",
-        "-                                               ",
-        "-                                              *",
-        "-      -           -       -      -      -      ",
-        "-                                              -",
-        "--            -                                -",
-        "-                                              -",
-        "-                                              -",
-        "-             -                                -",
-        "-                                              -",
-        "-                   -                          -",
-        "-                                              -",
-        "-                          -                   -",
-        "-                                              -",
-        "-                                 -            -",
-        "-                                              -",
-        "                                         ---   -",
-        "--------------                                 -",
-        "/                                              -",
-        " ----                                    ---   -",
-        "-    ---                                       -",
-        "-       ---                                    -",
-        "-          ---                     ---         -",
-        "-                      ---    --               -",
-        "-------------------____________________________-"]
-
-    x = y = 0  # координаты
-    for row in level:  # вся строка
-        for col in row:  # каждый символ
-            if col == "-":
-                # создаем блок, заливаем его цветом и рисуем его
-                pf = Platform(x, y)
-                entities.add(pf)
-                platforms.append(pf)
-            if col == "/":
-                level_exit = Platform(x, y, "exit_door")
-                entities.add(level_exit)
-            if col == "*":
-                level_exit = Platform(x, y, "exit_door_2")
-                entities.add(level_exit)
-                level_exits.append(level_exit)
-            if col == "_":
-                lava = Platform(x, y, "lava")
-                entities.add(lava)
-                lavas.append(lava)
-            if not is_einstein:
-                if col == "c":
-                    gallery_einstein = "gallery_einstein"
-                    gallery_feature = Platform(x, y, gallery_einstein)
-                    entities.add(gallery_feature)
-                    gallery_features.append(gallery_feature)
-
-            x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
-        y += PLATFORM_HEIGHT  # то же самое и с высотой
-        x = 0
+    switch = True
+    part_1 = True
+    part_2 = False
 
     run = True
     while run:
         timer.tick(FPS)
+        if switch:
+            if part_1:
+                level = Level_1.lvl_1
+                x = y = 0  # координаты
+                for row in level:  # вся строка
+                    for col in row:  # каждый символ
+                        if col == "-":
+                            # создаем блок, заливаем его цветом и рисуем его
+                            pf = Platform(x, y)
+                            entities.add(pf)
+                            platforms.append(pf)
+                        if col == "/":
+                            level_exit = Platform(x, y, "exit_door_180")
+                            entities.add(level_exit)
+                            level_exits.append(level_exit)
+                        if col == "p":
+                            pass_in_level = Platform(x, y, "pass_2")
+                            entities.add(pass_in_level)
+                            passes_in_level.append(pass_in_level)
+                        if col == "*":
+                            level_exit = Platform(x, y, "exit_door_2")
+                            entities.add(level_exit)
+                            level_exits.append(level_exit)
+                        if col == "_":
+                            lava = Platform(x, y, "lava_erase")
+                            entities.add(lava)
+                            lavas.append(lava)
+                        if not is_einstein:
+                            if col == "c":
+                                gallery_einstein = "gallery_einstein"
+                                gallery_feature = Platform(x, y, gallery_einstein)
+                                entities.add(gallery_feature)
+                                gallery_features.append(gallery_feature)
+
+                        x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
+                    y += PLATFORM_HEIGHT  # то же самое и с высотой
+                    x = 0
+                switch = False
+            if part_2:
+                hero.startX = PLATFORM_WIDTH * 2
+                hero.startY = PLATFORM_HEIGHT * 2
+                level = Level_1.lvl_2
+                x = y = 0  # координаты
+                for row in level:  # вся строка
+                    for col in row:  # каждый символ
+                        if col == "-":
+                            # создаем блок, заливаем его цветом и рисуем его
+                            pf = Platform(x, y)
+                            entities.add(pf)
+                            platforms.append(pf)
+                        if col == "/":
+                            level_exit = Platform(x, y, "exit_door_180")
+                            entities.add(level_exit)
+                            level_exits.append(level_exit)
+                        if col == "p":
+                            pass_in_level = Platform(x, y, "pass_2")
+                            entities.add(pass_in_level)
+                        if col == "*":
+                            level_exit = Platform(x, y, "exit_door_2")
+                            entities.add(level_exit)
+                            level_exits.append(level_exit)
+                        if col == "_":
+                            lava = Platform(x, y, "lava_erase")
+                            entities.add(lava)
+                            lavas.append(lava)
+                        if not is_einstein:
+                            if col == "c":
+                                gallery_einstein = "gallery_einstein"
+                                gallery_feature = Platform(x, y, gallery_einstein)
+                                entities.add(gallery_feature)
+                                gallery_features.append(gallery_feature)
+
+                        x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
+                    y += PLATFORM_HEIGHT  # то же самое и с высотой
+                    x = 0
+                switch = False
         if running_2 == 1:
             for event in pygame.event.get():  # Обрабатываем события
                 if event.type == QUIT:
@@ -654,12 +732,152 @@ def level_2(bg, screen):
 
             hero.collide_enemy(enemies, hero)
             if hero.health > 0:
+
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
-                typical_enemy_1.update()
-                typical_enemy_2.update()
-                typical_enemy_3.update(26)
-                typical_enemy_4.update(35)
+                typical_enemy_1.update(move_counter=25)
+                typical_enemy_2.update(move_counter=15)
+                typical_enemy_3.update(move_counter=16)
+                typical_enemy_4.update(move_counter=16)
+                typical_enemy_5.update(move_counter=18)
+                typical_enemy_6.update(move_counter=12)
+                typical_enemy_7.update(move_counter=20)
+
+                date_time_obj2 = datetime.datetime.now()
+                time_delta = date_time_obj2 - date_time_obj1
+                seconds = time_delta.total_seconds()
+
+                if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
+                    bullet_1 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 5, 10, "bomb")
+                    bullets_1.append(bullet_1)
+                    enemies.append(bullet_1)
+                    entities.add(bullet_1)
+
+                    centerX_hero, centerY_hero = hero.rect.center
+                    centerX_bullet_1, centerY_bullet_1 = bullet_1.rect.center
+                    dx_1 = centerX_hero - centerX_bullet_1
+                    dy_1 = centerY_hero - centerY_bullet_1
+                    c_1 = (dx_1 ** 2 + dy_1 ** 2) ** 0.5
+
+                if len(bullets_1) > 0:
+                    if c_1 > 500 and len(bullets_1) != 0:
+                        enemies.remove(bullet_1)
+                        entities.remove(bullet_1)
+                        bullets_1.remove(bullet_1)
+                    if bullet_1.rect.x < WIN_WIDTH or bullet_1.rect.x > 0 or bullet_1.rect.y < WIN_HEIGHT \
+                            or bullet_1.rect.y > 0:
+                        bullet_1.update(enemy_image="bomb", a=dx_1, b=dy_1, C=c_1)
+                    if bullet_1.rect.x >= WIN_WIDTH or bullet_1.rect.x <= 0 or bullet_1.rect.y >= WIN_HEIGHT \
+                            or bullet_1.rect.y <= 0:
+                        enemies.remove(bullet_1)
+                        entities.remove(bullet_1)
+                        bullets_1.remove(bullet_1)
+
+                if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
+                    bullet_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 6, 10, "bomb")
+                    bullets_2.append(bullet_2)
+                    enemies.append(bullet_2)
+                    entities.add(bullet_2)
+
+                    centerX_hero, centerY_hero = hero.rect.center
+                    centerX_bullet_2, centerY_bullet_2 = bullet_2.rect.center
+
+                    dx_2 = centerX_hero - centerX_bullet_2
+                    dy_2 = centerY_hero - centerY_bullet_2
+                    c_2 = (dx_2 ** 2 + dy_2 ** 2) ** 0.5
+
+                if len(bullets_2) > 0:
+                    if c_2 > 500 and len(bullets_2) != 0:
+                        enemies.remove(bullet_2)
+                        entities.remove(bullet_2)
+                        bullets_2.remove(bullet_2)
+                    if bullet_2.rect.x < WIN_WIDTH or bullet_2.rect.x > 0 or bullet_2.rect.y < WIN_HEIGHT \
+                            or bullet_2.rect.y > 0:
+                        bullet_2.update(enemy_image="bomb", a=dx_2, b=dy_2, C=c_2)
+                    if bullet_2.rect.x >= WIN_WIDTH or bullet_2.rect.x <= 0 or bullet_2.rect.y >= WIN_HEIGHT \
+                            or bullet_2.rect.y <= 0:
+                        enemies.remove(bullet_2)
+                        entities.remove(bullet_2)
+                        bullets_2.remove(bullet_2)
+
+                if ((seconds + 1) // 1) % 3 == 0 and len(bullets_3) == 0:
+                    bullet_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, 10, "bomb")
+                    bullets_3.append(bullet_3)
+                    enemies.append(bullet_3)
+                    entities.add(bullet_3)
+
+                    centerX_hero, centerY_hero = hero.rect.center
+                    centerX_bullet_3, centerY_bullet_3 = bullet_3.rect.center
+                    dx_3 = centerX_hero - centerX_bullet_3
+                    dy_3 = centerY_hero - centerY_bullet_3
+                    c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
+
+                if len(bullets_3) > 0:
+                    if c_3 > 100 and len(bullets_3) != 0:
+                        enemies.remove(bullet_3)
+                        entities.remove(bullet_3)
+                        bullets_3.remove(bullet_3)
+                    if bullet_3.rect.x < WIN_WIDTH or bullet_3.rect.x > 0 or bullet_3.rect.y < WIN_HEIGHT \
+                            or bullet_3.rect.y > 0:
+                        bullet_3.update(enemy_image="bomb", a=dx_3, b=dy_3, C=c_3)
+                    if bullet_3.rect.x >= WIN_WIDTH or bullet_3.rect.x <= 0 or bullet_3.rect.y >= WIN_HEIGHT \
+                            or bullet_3.rect.y <= 0:
+                        enemies.remove(bullet_3)
+                        entities.remove(bullet_3)
+                        bullets_3.remove(bullet_3)
+
+                if ((seconds + 1) // 1) % 3 == 0 and len(bullets_4) == 0:
+                    bullet_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 11, 10, "bomb")
+                    bullets_4.append(bullet_4)
+                    enemies.append(bullet_4)
+                    entities.add(bullet_4)
+
+                    centerX_hero, centerY_hero = hero.rect.center
+                    centerX_bullet_4, centerY_bullet_4 = bullet_4.rect.center
+                    dx_4 = centerX_hero - centerX_bullet_4
+                    dy_4 = centerY_hero - centerY_bullet_4
+                    c_4 = (dx_4 ** 2 + dy_4 ** 2) ** 0.5
+
+                if len(bullets_4) > 0:
+                    if c_4 > 100 and len(bullets_4) != 0:
+                        enemies.remove(bullet_4)
+                        entities.remove(bullet_4)
+                        bullets_4.remove(bullet_4)
+                    if bullet_4.rect.x < WIN_WIDTH or bullet_4.rect.x > 0 or bullet_4.rect.y < WIN_HEIGHT \
+                            or bullet_4.rect.y > 0:
+                        bullet_4.update(enemy_image="bomb", a=dx_4, b=dy_4, C=c_4)
+                    if bullet_4.rect.x >= WIN_WIDTH or bullet_4.rect.x <= 0 or bullet_4.rect.y >= WIN_HEIGHT \
+                            or bullet_4.rect.y <= 0:
+                        enemies.remove(bullet_4)
+                        entities.remove(bullet_4)
+                        bullets_4.remove(bullet_4)
+
+                if ((seconds + 1) // 1) % 3 == 0 and len(bullets_5) == 0:
+                    bullet_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 13, 10, "bomb")
+                    bullets_5.append(bullet_5)
+                    enemies.append(bullet_5)
+                    entities.add(bullet_5)
+
+                    centerX_hero, centerY_hero = hero.rect.center
+                    centerX_bullet_5, centerY_bullet_5 = bullet_5.rect.center
+                    dx_5 = centerX_hero - centerX_bullet_5
+                    dy_5 = centerY_hero - centerY_bullet_5
+                    c_5 = (dx_5 ** 2 + dy_5 ** 2) ** 0.5
+
+                if len(bullets_5) > 0:
+                    if c_5 > 100 and len(bullets_5) != 0:
+                        enemies.remove(bullet_5)
+                        entities.remove(bullet_5)
+                        bullets_5.remove(bullet_5)
+                    if bullet_5.rect.x < WIN_WIDTH or bullet_5.rect.x > 0 or bullet_5.rect.y < WIN_HEIGHT \
+                            or bullet_5.rect.y > 0:
+                        bullet_5.update(enemy_image="bomb", a=dx_5, b=dy_5, C=c_5)
+                    if bullet_5.rect.x >= WIN_WIDTH or bullet_5.rect.x <= 0 or bullet_5.rect.y >= WIN_HEIGHT \
+                            or bullet_5.rect.y <= 0:
+                        enemies.remove(bullet_5)
+                        entities.remove(bullet_5)
+                        bullets_5.remove(bullet_5)
+
                 entities.draw(screen)  # отображение
 
                 for e in level_exits:
@@ -679,6 +897,11 @@ def level_2(bg, screen):
                     if sprite.collide_rect(hero, g):
                         entities.remove(gallery_feature)
                         einstein = True
+                # for pa in passes_in_level:
+                #     if sprite.collide_rect(hero, pa):
+                #         part_1 = False
+                #         part_2 = True
+                #         switch = True
                 for l in lavas:
                     if sprite.collide_rect(hero, l):
                         hero.health = 0

@@ -9,11 +9,13 @@ COLOR = "#888888"
 user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)
 WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
-WIDTH = WIN_WIDTH * 16 / 960
-HEIGHT = WIN_HEIGHT * 5.5 / 135
-GRAVITY = WIN_HEIGHT * 8.4 / 21600
-JUMP_POWER = WIN_HEIGHT / 106.2
-MOVE_SPEED = WIN_WIDTH * 4 / 1920
+PLATFORM_WIDTH = WIN_WIDTH / 48
+PLATFORM_HEIGHT = WIN_HEIGHT / 25.25
+WIDTH = PLATFORM_WIDTH
+HEIGHT = PLATFORM_HEIGHT
+GRAVITY = PLATFORM_HEIGHT * 0.013
+JUMP_POWER = PLATFORM_HEIGHT / 3.3
+MOVE_SPEED = PLATFORM_WIDTH / 9.4
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 ANIMATION_DELAY = 0.1  # скорость смены кадров
 ICON_DIR = os.path.dirname(__file__)  # Полный путь к каталогу с файлами
@@ -37,13 +39,13 @@ ANIMATION_STAY = [('%s/FOPF/0.png' % ICON_DIR, 0.1)]
 class Player(sprite.Sprite):
     def __init__(self, x, y, HEALTH=100):
         sprite.Sprite.__init__(self)
-        self.xvel = 0  # скорость перемещения. 0 - стоять на месте
+        self.x_vel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
         self.startY = y
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
-        self.yvel = 0  # скорость вертикального перемещения
+        self.y_vel = 0  # скорость вертикального перемещения
         self.onGround = False  # На земле ли я?
         self.health = HEALTH
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
@@ -76,19 +78,19 @@ class Player(sprite.Sprite):
     def update(self, left, right, Up, platforms):
         if Up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
-                self.yvel = -JUMP_POWER
+                self.y_vel = -JUMP_POWER
             self.image.fill(Color(COLOR))
             self.boltAnimJump.blit(self.image, (0, 0))
         if left:
-            self.xvel = -MOVE_SPEED  # Лево
+            self.x_vel = -MOVE_SPEED  # Лево
             self.image.fill(Color(COLOR))
             if Up:  # для прыжка влево есть отдельная анимация
                 self.boltAnimJumpLeft.blit(self.image, (0, 0))
             else:
                 self.boltAnimLeft.blit(self.image, (0, 0))
         if right:
-            self.xvel = MOVE_SPEED  # Право
-            self.xvel = MOVE_SPEED  # Право = x + n
+            self.x_vel = MOVE_SPEED  # Право
+            self.x_vel = MOVE_SPEED  # Право = x + n
             self.image.fill(Color(COLOR))
             if Up:
                 self.boltAnimJumpRight.blit(self.image, (0, 0))
@@ -96,18 +98,18 @@ class Player(sprite.Sprite):
                 self.boltAnimRight.blit(self.image, (0, 0))
 
         if not (left or right):  # стоим, когда нет указаний идти
-            self.xvel = 0
+            self.x_vel = 0
             if not Up:
                 self.image.fill(Color(COLOR))
                 self.boltAnimStay.blit(self.image, (0, 0))
         if not self.onGround:
-            self.yvel += GRAVITY
+            self.y_vel += GRAVITY
         self.onGround = False  # Мы не знаем, когда мы на земле((
-        self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms)
+        self.rect.y += self.y_vel
+        self.collide(0, self.y_vel, platforms)
 
-        self.rect.x += self.xvel  # переносим свои положение на xvel
-        self.collide(self.xvel, 0, platforms)
+        self.rect.x += self.x_vel  # переносим свои положение на xvel
+        self.collide(self.x_vel, 0, platforms)
 
     def collide(self, xvel, yvel, platforms):
         for p in platforms:
@@ -122,11 +124,11 @@ class Player(sprite.Sprite):
                 if yvel > 0:  # если падает вниз
                     self.rect.bottom = p.rect.top  # то не падает вниз
                     self.onGround = True  # и становится на что-то твердое
-                    self.yvel = 0  # и энергия падения пропадает
+                    self.y_vel = 0  # и энергия падения пропадает
 
                 if yvel < 0:  # если движется вверх
                     self.rect.top = p.rect.bottom  # то не движется вверх
-                    self.yvel = 0  # и энергия прыжка пропадает
+                    self.y_vel = 0  # и энергия прыжка пропадает
 
     def collide_enemy(self, enemies, hero):
         for en in enemies:

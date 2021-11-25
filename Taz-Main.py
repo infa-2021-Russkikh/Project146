@@ -801,7 +801,7 @@ def level_2(bg, screen):
                         bullets_2.remove(bullet_2)
 
                 if ((seconds + 1) // 1) % 3 == 0 and len(bullets_3) == 0:
-                    bullet_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, 10, "bomb")
+                    bullet_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 7, 5, "bomb_mini")
                     bullets_3.append(bullet_3)
                     enemies.append(bullet_3)
                     entities.add(bullet_3)
@@ -813,13 +813,13 @@ def level_2(bg, screen):
                     c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
 
                 if len(bullets_3) > 0:
-                    if c_3 > 100 and len(bullets_3) != 0:
+                    if c_3 > PLATFORM_HEIGHT*3 and len(bullets_3) != 0:
                         enemies.remove(bullet_3)
                         entities.remove(bullet_3)
                         bullets_3.remove(bullet_3)
                     if bullet_3.rect.x < WIN_WIDTH or bullet_3.rect.x > 0 or bullet_3.rect.y < WIN_HEIGHT \
                             or bullet_3.rect.y > 0:
-                        bullet_3.update(enemy_image="bomb", a=dx_3, b=dy_3, C=c_3)
+                        bullet_3.update(enemy_image="bomb_mini", a=dx_3, b=dy_3, C=c_3)
                     if bullet_3.rect.x >= WIN_WIDTH or bullet_3.rect.x <= 0 or bullet_3.rect.y >= WIN_HEIGHT \
                             or bullet_3.rect.y <= 0:
                         enemies.remove(bullet_3)
@@ -827,7 +827,7 @@ def level_2(bg, screen):
                         bullets_3.remove(bullet_3)
 
                 if ((seconds + 1) // 1) % 3 == 0 and len(bullets_4) == 0:
-                    bullet_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 11, 10, "bomb")
+                    bullet_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 11, 5, "bomb_mini")
                     bullets_4.append(bullet_4)
                     enemies.append(bullet_4)
                     entities.add(bullet_4)
@@ -839,13 +839,13 @@ def level_2(bg, screen):
                     c_4 = (dx_4 ** 2 + dy_4 ** 2) ** 0.5
 
                 if len(bullets_4) > 0:
-                    if c_4 > 100 and len(bullets_4) != 0:
+                    if c_4 > PLATFORM_HEIGHT*3 and len(bullets_4) != 0:
                         enemies.remove(bullet_4)
                         entities.remove(bullet_4)
                         bullets_4.remove(bullet_4)
                     if bullet_4.rect.x < WIN_WIDTH or bullet_4.rect.x > 0 or bullet_4.rect.y < WIN_HEIGHT \
                             or bullet_4.rect.y > 0:
-                        bullet_4.update(enemy_image="bomb", a=dx_4, b=dy_4, C=c_4)
+                        bullet_4.update(enemy_image="bomb_mini", a=dx_4, b=dy_4, C=c_4)
                     if bullet_4.rect.x >= WIN_WIDTH or bullet_4.rect.x <= 0 or bullet_4.rect.y >= WIN_HEIGHT \
                             or bullet_4.rect.y <= 0:
                         enemies.remove(bullet_4)
@@ -853,7 +853,7 @@ def level_2(bg, screen):
                         bullets_4.remove(bullet_4)
 
                 if ((seconds + 1) // 1) % 3 == 0 and len(bullets_5) == 0:
-                    bullet_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 13, 10, "bomb")
+                    bullet_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, 5, "bomb_mini")
                     bullets_5.append(bullet_5)
                     enemies.append(bullet_5)
                     entities.add(bullet_5)
@@ -865,13 +865,13 @@ def level_2(bg, screen):
                     c_5 = (dx_5 ** 2 + dy_5 ** 2) ** 0.5
 
                 if len(bullets_5) > 0:
-                    if c_5 > 100 and len(bullets_5) != 0:
+                    if c_5 > PLATFORM_HEIGHT*3 and len(bullets_5) != 0:
                         enemies.remove(bullet_5)
                         entities.remove(bullet_5)
                         bullets_5.remove(bullet_5)
                     if bullet_5.rect.x < WIN_WIDTH or bullet_5.rect.x > 0 or bullet_5.rect.y < WIN_HEIGHT \
                             or bullet_5.rect.y > 0:
-                        bullet_5.update(enemy_image="bomb", a=dx_5, b=dy_5, C=c_5)
+                        bullet_5.update(enemy_image="bomb_mini", a=dx_5, b=dy_5, C=c_5)
                     if bullet_5.rect.x >= WIN_WIDTH or bullet_5.rect.x <= 0 or bullet_5.rect.y >= WIN_HEIGHT \
                             or bullet_5.rect.y <= 0:
                         enemies.remove(bullet_5)

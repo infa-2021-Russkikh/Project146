@@ -574,7 +574,7 @@ def level_2(bg, screen):
     typical_enemy_6 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 27, PLATFORM_HEIGHT * 3, 4)
     typical_enemy_7 = Enemy(PLATFORM_WIDTH * 30.5, PLATFORM_HEIGHT * 22)
     archer_enemy_1 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 5, enemy_image="enemy_2")
-    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 6, enemy_image="enemy_2")
+    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 9, PLATFORM_HEIGHT * 7, enemy_image="enemy_2")
     archer_enemy_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 7, enemy_image="enemy_2_straight")
     archer_enemy_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 11, enemy_image="enemy_2")
     archer_enemy_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, enemy_image="enemy_2_90")
@@ -813,7 +813,7 @@ def level_2(bg, screen):
                     c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
 
                 if len(bullets_3) > 0:
-                    if c_3 > PLATFORM_HEIGHT*3 and len(bullets_3) != 0:
+                    if c_3 > PLATFORM_HEIGHT*4 and len(bullets_3) != 0:
                         enemies.remove(bullet_3)
                         entities.remove(bullet_3)
                         bullets_3.remove(bullet_3)
@@ -839,7 +839,7 @@ def level_2(bg, screen):
                     c_4 = (dx_4 ** 2 + dy_4 ** 2) ** 0.5
 
                 if len(bullets_4) > 0:
-                    if c_4 > PLATFORM_HEIGHT*3 and len(bullets_4) != 0:
+                    if c_4 > PLATFORM_HEIGHT*4 and len(bullets_4) != 0:
                         enemies.remove(bullet_4)
                         entities.remove(bullet_4)
                         bullets_4.remove(bullet_4)
@@ -865,7 +865,7 @@ def level_2(bg, screen):
                     c_5 = (dx_5 ** 2 + dy_5 ** 2) ** 0.5
 
                 if len(bullets_5) > 0:
-                    if c_5 > PLATFORM_HEIGHT*3 and len(bullets_5) != 0:
+                    if c_5 > PLATFORM_HEIGHT*4 and len(bullets_5) != 0:
                         enemies.remove(bullet_5)
                         entities.remove(bullet_5)
                         bullets_5.remove(bullet_5)

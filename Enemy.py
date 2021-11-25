@@ -28,3 +28,6 @@ class Enemy(sprite.Sprite):
         if enemy_image == "bomb":
             self.rect.x += self.move_direction * a / C
             self.rect.y += self.move_direction * b / C
+        if enemy_image == "bomb_mini":
+            self.rect.x += self.move_direction * a / C
+            self.rect.y += self.move_direction * b / C

@@ -580,6 +580,8 @@ def level_2(bg, screen):
     archer_enemy_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, enemy_image="enemy_2_90")
 
     hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
+    # hero = Player(WIN_WIDTH - PLATFORM_WIDTH*18, WIN_HEIGHT - PLATFORM_HEIGHT * 9)  # создаем героя по
+    # (x,y) координатам
     left = right = False  # по умолчанию — стоим
     Up = False
 
@@ -634,6 +636,11 @@ def level_2(bg, screen):
                             pf = Platform(x, y)
                             entities.add(pf)
                             platforms.append(pf)
+                        if col == "=":
+                            # создаем блок, заливаем его цветом и рисуем его
+                            pfo = Platform(x, y+PLATFORM_HEIGHT/10, "platform")
+                            entities.add(pfo)
+                            platforms.append(pfo)
                         if col == "/":
                             level_exit = Platform(x, y, "exit_door_180")
                             entities.add(level_exit)
@@ -748,7 +755,7 @@ def level_2(bg, screen):
                 seconds = time_delta.total_seconds()
 
                 if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
-                    bullet_1 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 5, 10, "bomb")
+                    bullet_1 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 5, 10, "bomb_erase")
                     bullets_1.append(bullet_1)
                     enemies.append(bullet_1)
                     entities.add(bullet_1)
@@ -774,7 +781,7 @@ def level_2(bg, screen):
                         bullets_1.remove(bullet_1)
 
                 if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
-                    bullet_2 = Enemy(PLATFORM_WIDTH * 9, PLATFORM_HEIGHT * 7, 10, "bomb")
+                    bullet_2 = Enemy(PLATFORM_WIDTH * 9, PLATFORM_HEIGHT * 7, 10, "bomb_erase")
                     bullets_2.append(bullet_2)
                     enemies.append(bullet_2)
                     entities.add(bullet_2)

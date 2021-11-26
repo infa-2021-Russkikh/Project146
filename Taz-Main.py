@@ -35,6 +35,7 @@ gallery_pictures = []
 amount_passed_levels = dict["amount_passed_levels"]
 is_landay = dict["is_landay"]
 is_einstein = dict["is_einstein"]
+is_red_key = dict["is_red_key"]
 gallery_pictures.append(is_landay)
 is_menu = False
 is_options_menu = False
@@ -69,6 +70,9 @@ def menu(bg, screen):
     # bg = pygame.image.load("Textures/additional task.png")
     # screen.blit(bg, (0, 0))
     screen.fill(Color(GREEN))
+
+    with open("saves.json", 'r') as f:
+        dict = json.load(f)
 
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*2, WIN_WIDTH / 3.2,
                           PLATFORM_HEIGHT*2, 'Start')
@@ -281,33 +285,33 @@ def options_menu(bg, screen):
                 if music_off_button.is_pressed(mouse_pos, mouse_pressed):
                     pygame.mixer.music.set_volume(0)
                     dict["music_volume"] = 0
-                    with open("saves.json", 'w') as f:
-                        json.dump(dict, f)
-                    with open("saves.json", 'r') as f:
-                        dict = json.load(f)
+                    with open("saves.json", 'w') as foo:
+                        json.dump(dict, foo)
+                    with open("saves.json", 'r') as foo:
+                        dict = json.load(foo)
                 if music_on_button.is_pressed(mouse_pos, mouse_pressed):
                     pygame.mixer.music.set_volume(1)
                     dict["music_volume"] = 1
-                    with open("saves.json", 'w') as f:
-                        json.dump(dict, f)
-                    with open("saves.json", 'r') as f:
-                        dict = json.load(f)
+                    with open("saves.json", 'w') as foo:
+                        json.dump(dict, foo)
+                    with open("saves.json", 'r') as foo:
+                        dict = json.load(foo)
                 if reset_progress_button.is_pressed(mouse_pos, mouse_pressed):
                     amount_passed_levels = 0
                     is_landay = 0
                     dict["amount_passed_levels"] = 0
                     dict["is_landay"] = 0
-                    with open("saves.json", 'w') as f:
-                        json.dump(dict, f)
-                    with open("saves.json", 'r') as f:
-                        dict = json.load(f)
+                    with open("saves.json", 'w') as foo:
+                        json.dump(dict, foo)
+                    with open("saves.json", 'r') as foo:
+                        dict = json.load(foo)
 
         pygame.display.update()
         return is_options_menu, is_menu, menu_music, is_landay, amount_passed_levels
 
 
 def achievements_menu(bg, screen):
-    global is_menu, menu_music, is_achievements_menu, dict
+    global is_menu, menu_music, is_achievements_menu, dict, is_red_key, your_time_sec_1
 
     screen.fill(Color(GREEN))
 
@@ -319,18 +323,35 @@ def achievements_menu(bg, screen):
     try:
         level_1_record = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
                                 PLATFORM_HEIGHT, f'{dict["your_time_seconds_1"]}')
-        level_2_record = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
-                                PLATFORM_HEIGHT, f'{dict["your_time_seconds_2"]}')
-    except:
-        level_1_record = Button(GREEN, PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+    except KeyError:
+        level_1_record = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
                                 PLATFORM_HEIGHT, "Empty -_-")
-        level_2_record = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+    try:
+        level_2_record = Button(GREEN, PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+                                PLATFORM_HEIGHT, f'{dict["your_time_seconds_2"]}')
+    except KeyError:
+        level_2_record = Button(GREEN, PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
                                 PLATFORM_HEIGHT, "Empty -_-")
 
-    level_1_record.draw(screen, Color=WHITE)
-    level_2_record.draw(screen, Color=WHITE)
-    level_1_name.draw(screen)
-    level_2_name.draw(screen)
+    level_1_name.draw(screen, Color=WHITE)
+    level_2_name.draw(screen, Color=WHITE)
+    if dict["your_time_seconds_1"] <= 12.5:
+        level_1_record.draw(screen, Color=WHITE)
+    else:
+        level_1_record.draw(screen, Color=RED)
+    if dict["your_time_seconds_2"] <= 60:
+        level_2_record.draw(screen, Color=WHITE)
+    else:
+        level_2_record.draw(screen, Color=RED)
+
+    if dict["is_red_key"] == 0:
+        picture_1_image = pygame.image.load("Textures/hud_keyRed_disabled.png")
+        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*8))
+        screen.blit(picture_1_image, picture_1_image_rect)
+    else:
+        picture_1_image = pygame.image.load("Textures/hud_keyRed.png")
+        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*8))
+        screen.blit(picture_1_image, picture_1_image_rect)
 
     back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Back')
@@ -361,7 +382,8 @@ def pause_menu(bg, screen):
     :param screen:
     :return:
     """
-    global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, date_time_obj4
+    global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, date_time_obj4,\
+        is_pass_level_screen, is_restart
     pygame.mixer.music.pause()
 
     pause_bg = pygame.image.load("Textures/pause_bg.png")
@@ -374,6 +396,10 @@ def pause_menu(bg, screen):
     menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Menu')
     menu_button.draw(screen)
+
+    restart_button = Button(RED, PLATFORM_WIDTH * 21, PLATFORM_HEIGHT * 8, PLATFORM_WIDTH * 6,
+                            PLATFORM_HEIGHT * 2, 'Restart')
+    restart_button.draw(screen)
 
     pygame.display.update()
 
@@ -400,6 +426,17 @@ def pause_menu(bg, screen):
                     running_1 = 0
                     running_2 = 0
                     menu_music = False
+                    run = False
+                if restart_button.is_pressed(mouse_pos, mouse_pressed):
+                    dt = datetime.datetime.now() - datetime.datetime.now()
+                    if Number_of_level == 1:
+                        is_restart = True
+                        running_1 = 0
+                        is_pass_level_screen = False
+                    if Number_of_level == 2:
+                        is_restart = True
+                        is_pass_level_screen = False
+                        running_2 = 0
                     run = False
         pygame.display.update()
     pygame.mixer.music.unpause()
@@ -469,21 +506,43 @@ def restart():
     is_restart = False
 
 
-def pass_level_screen(bg, screen, your_time):
+def pass_level_screen(bg, screen, your_time, your_time_seconds):
     global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, \
         date_time_obj4, is_pass_level_screen, is_restart
 
-    pause_bg = pygame.image.load("Textures/pause_bg.png")
+    pause_bg = pygame.image.load("Textures/maybe_pause_bg.png")
     screen.blit(pause_bg, (PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 1))
 
     next_level_button = Button(RED, PLATFORM_WIDTH * 20, WIN_HEIGHT / 6 - WIN_HEIGHT / 27,
                                PLATFORM_WIDTH * 8,
                                WIN_HEIGHT / 15, 'Next_level')
     next_level_button.draw(screen, size=48)
+    if Number_of_level == 1:
+        on_record_time_button = Button(RED, PLATFORM_WIDTH * 30, PLATFORM_HEIGHT * 13, 0.000001,
+                                      0.000001, 'of 0:00:12:5')
+        on_record_time_button.draw(screen, size=48, Color=WHITE)
 
-    what_time_button = Button(RED, PLATFORM_WIDTH * 24, PLATFORM_HEIGHT * 13, 0.000001,
-                              0.000001, f'{your_time}')
-    what_time_button.draw(screen, size=48, Color=WHITE)
+        if your_time_seconds > 12.5:
+            what_time_button = Button(RED, PLATFORM_WIDTH * 20.5, PLATFORM_HEIGHT * 13, 0.000001,
+                                      0.000001, f'{your_time}')
+            what_time_button.draw(screen, size=48, Color=RED)
+        if your_time_seconds <= 12.5:
+            what_time_button = Button(RED, PLATFORM_WIDTH * 20.5, PLATFORM_HEIGHT * 13, 0.000001,
+                                      0.000001, f'{your_time}')
+            what_time_button.draw(screen, size=48, Color=GREEN)
+    if Number_of_level == 2:
+        on_record_time_button = Button(RED, PLATFORM_WIDTH * 30, PLATFORM_HEIGHT * 13, 0.000001,
+                                       0.000001, 'of 0:00:01:00')
+        on_record_time_button.draw(screen, size=48, Color=WHITE)
+
+        if your_time_seconds > 60:
+            what_time_button = Button(RED, PLATFORM_WIDTH * 20.5, PLATFORM_HEIGHT * 13, 0.000001,
+                                      0.000001, f'{your_time}')
+            what_time_button.draw(screen, size=48, Color=RED)
+        if your_time_seconds <= 60:
+            what_time_button = Button(RED, PLATFORM_WIDTH * 20.5, PLATFORM_HEIGHT * 13, 0.000001,
+                                      0.000001, f'{your_time}')
+            what_time_button.draw(screen, size=48, Color=GREEN)
 
     restart_button = Button(RED, PLATFORM_WIDTH * 21, PLATFORM_HEIGHT * 8, PLATFORM_WIDTH * 6,
                             PLATFORM_HEIGHT * 2, 'Restart')
@@ -546,7 +605,7 @@ def level_1(bg, screen):
     :return:
     """
     global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels, dict, \
-        switch_pause, date_time_obj4, is_pass_level_screen
+        switch_pause, date_time_obj4, is_pass_level_screen, is_red_key
     Number_of_level = 1
 
     date_time_obj1 = datetime.datetime.now()
@@ -582,13 +641,13 @@ def level_1(bg, screen):
     level = [
         "------------------------------------------------",
         "-                                               ",
-        "-                                              *",
-        "-                  --                           ",
-        "-             --                               -",
-        "-                       -        -             -",
+        "-                      -      c                *",
+        "-                             -                 ",
+        "-             --   -       -                   -",
+        "-                      -                       -",
         "-                                      ----    -",
-        "-              -        c   --                 -",
-        "-                       -        -----         -",
+        "-              -                               -",
+        "-                                -----         -",
         "-                                              -",
         "-              -                               -",
         "-    -----                            -        -",
@@ -610,7 +669,7 @@ def level_1(bg, screen):
     for row in level:  # вся строка
         for col in row:  # каждый символ
             if col == "-":
-                # создаем блок, заливаем его цветом и рисеум его
+                # создаем блок, заливаем его цветом и рисуем его
                 pf = Platform(x, y)
                 entities.add(pf)
                 platforms.append(pf)
@@ -694,20 +753,22 @@ def level_1(bg, screen):
                         try:
                             if your_time_seconds < dict["your_time_seconds_1"]:
                                 dict["your_time_seconds_1"] = your_time_seconds
-                        except:
+                        except KeyError:
                             dict["your_time_seconds_1"] = your_time_seconds
+                        if dict["your_time_seconds_1"] <= 12.5:
+                            dict["is_red_key"] = 1
 
                         dict["amount_passed_levels"] = 1
                         if landay:
                             is_landay = 1
                             dict["is_landay"] = 1
-                        with open("saves.json", 'w') as f:
-                            json.dump(dict, f)
+                        with open("saves.json", 'w') as foo:
+                            json.dump(dict, foo)
 
                         menu_music = False
                         is_pass_level_screen = True
                         while is_pass_level_screen:
-                            pass_level_screen(bg, screen, your_time)
+                            pass_level_screen(bg, screen, your_time, your_time_seconds)
                         run = False
                 for g in gallery_features:
                     if sprite.collide_rect(hero, g):
@@ -729,7 +790,7 @@ def level_1(bg, screen):
             run = False
 
     return is_game_over, running_1, is_landay, is_menu, menu_music, Number_of_level, amount_passed_levels, \
-           switch_pause, is_pass_level_screen
+           switch_pause, is_pass_level_screen, is_red_key
 
 
 def level_2(bg, screen):
@@ -740,7 +801,7 @@ def level_2(bg, screen):
     :return:
     """
     global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level, dict, switch_pause, \
-        date_time_obj4, dt, is_pass_level_screen
+        date_time_obj4, dt, is_pass_level_screen, is_red_key
     Number_of_level = 2
 
     pygame.mixer.music.set_volume(dict["music_volume"])
@@ -767,6 +828,7 @@ def level_2(bg, screen):
     Up = False
 
     einstein = False
+    red_key = False
 
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
@@ -779,6 +841,7 @@ def level_2(bg, screen):
     bullets_4 = []
     bullets_5 = []
     lavas = []
+    keys = []
     gallery_features = []
 
     date_time_obj1 = datetime.datetime.now()
@@ -838,6 +901,11 @@ def level_2(bg, screen):
                             lava = Platform(x, y, "lava_erase")
                             entities.add(lava)
                             lavas.append(lava)
+                        if dict["is_red_key"] == 1 and red_key:
+                            if col == "k":
+                                key = Platform(x, y, "keyRed")
+                                entities.add(key)
+                                keys.append(key)
                         if not is_einstein:
                             if col == "c":
                                 gallery_einstein = "gallery_einstein"
@@ -849,44 +917,44 @@ def level_2(bg, screen):
                     y += PLATFORM_HEIGHT  # то же самое и с высотой
                     x = 0
                 switch = False
-            if part_2:
-                hero.startX = PLATFORM_WIDTH * 2
-                hero.startY = PLATFORM_HEIGHT * 2
-                level = Level_1.lvl_2
-                x = y = 0  # координаты
-                for row in level:  # вся строка
-                    for col in row:  # каждый символ
-                        if col == "-":
-                            # создаем блок, заливаем его цветом и рисуем его
-                            pf = Platform(x, y)
-                            entities.add(pf)
-                            platforms.append(pf)
-                        if col == "/":
-                            level_exit = Platform(x, y, "exit_door_180")
-                            entities.add(level_exit)
-                            level_exits.append(level_exit)
-                        if col == "p":
-                            pass_in_level = Platform(x, y, "pass_2")
-                            entities.add(pass_in_level)
-                        if col == "*":
-                            level_exit = Platform(x, y, "exit_door_2")
-                            entities.add(level_exit)
-                            level_exits.append(level_exit)
-                        if col == "_":
-                            lava = Platform(x, y, "lava_erase")
-                            entities.add(lava)
-                            lavas.append(lava)
-                        if not is_einstein:
-                            if col == "c":
-                                gallery_einstein = "gallery_einstein"
-                                gallery_feature = Platform(x, y, gallery_einstein)
-                                entities.add(gallery_feature)
-                                gallery_features.append(gallery_feature)
-
-                        x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
-                    y += PLATFORM_HEIGHT  # то же самое и с высотой
-                    x = 0
-                switch = False
+            # if part_2:
+            #     hero.startX = PLATFORM_WIDTH * 2
+            #     hero.startY = PLATFORM_HEIGHT * 2
+            #     level = Level_1.lvl_2
+            #     x = y = 0  # координаты
+            #     for row in level:  # вся строка
+            #         for col in row:  # каждый символ
+            #             if col == "-":
+            #                 # создаем блок, заливаем его цветом и рисуем его
+            #                 pf = Platform(x, y)
+            #                 entities.add(pf)
+            #                 platforms.append(pf)
+            #             if col == "/":
+            #                 level_exit = Platform(x, y, "exit_door_180")
+            #                 entities.add(level_exit)
+            #                 level_exits.append(level_exit)
+            #             if col == "p":
+            #                 pass_in_level = Platform(x, y, "pass_2")
+            #                 entities.add(pass_in_level)
+            #             if col == "*":
+            #                 level_exit = Platform(x, y, "exit_door_2")
+            #                 entities.add(level_exit)
+            #                 level_exits.append(level_exit)
+            #             if col == "_":
+            #                 lava = Platform(x, y, "lava_erase")
+            #                 entities.add(lava)
+            #                 lavas.append(lava)
+            #             if not is_einstein:
+            #                 if col == "c":
+            #                     gallery_einstein = "gallery_einstein"
+            #                     gallery_feature = Platform(x, y, gallery_einstein)
+            #                     entities.add(gallery_feature)
+            #                     gallery_features.append(gallery_feature)
+            #
+            #             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
+            #         y += PLATFORM_HEIGHT  # то же самое и с высотой
+            #         x = 0
+            #     switch = False
         if running_2 == 1:
             for event in pygame.event.get():  # Обрабатываем события
                 if event.type == QUIT:
@@ -1088,24 +1156,30 @@ def level_2(bg, screen):
                         try:
                             if your_time_seconds < dict["your_time_seconds_2"]:
                                 dict["your_time_seconds_2"] = your_time_seconds
-                        except:
+                        except KeyError:
                             dict["your_time_seconds_2"] = your_time_seconds
 
                         if einstein:
                             is_einstein = 1
                             dict["is_einstein"] = 1
-                            with open("saves.json", 'w') as f:
-                                json.dump(dict, f)
+                            with open("saves.json", 'w') as foo:
+                                json.dump(dict, foo)
+                            with open("saves.json", 'r') as foo:
+                                dict = json.load(foo)
 
                         menu_music = False
                         is_pass_level_screen = True
                         while is_pass_level_screen:
-                            pass_level_screen(bg, screen, your_time)
+                            pass_level_screen(bg, screen, your_time, your_time_seconds)
                         run = False
                 for g in gallery_features:
                     if sprite.collide_rect(hero, g):
                         entities.remove(gallery_feature)
                         einstein = True
+                for k in keys:
+                    if sprite.collide_rect(hero, k):
+                        entities.remove(key)
+                        red_key = True
                 # for pa in passes_in_level:
                 #     if sprite.collide_rect(hero, pa):
                 #         part_1 = False
@@ -1129,7 +1203,7 @@ def level_2(bg, screen):
         elif running_2 == 0:
             run = False
 
-    return is_game_over, running_2, is_einstein, is_menu, menu_music, switch_pause, dt
+    return is_game_over, running_2, is_einstein, is_menu, menu_music, switch_pause, dt, is_red_key
 
 
 def main():

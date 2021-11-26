@@ -335,14 +335,20 @@ def achievements_menu(bg, screen):
 
     level_1_name.draw(screen, Color=WHITE)
     level_2_name.draw(screen, Color=WHITE)
-    if dict["your_time_seconds_1"] <= 12.5:
+    try:
+        if dict["your_time_seconds_1"] <= 12.5:
+            level_1_record.draw(screen, Color=WHITE)
+        else:
+            level_1_record.draw(screen, Color=RED)
+    except KeyError:
         level_1_record.draw(screen, Color=WHITE)
-    else:
-        level_1_record.draw(screen, Color=RED)
-    if dict["your_time_seconds_2"] <= 60:
+    try:
+        if dict["your_time_seconds_2"] <= 60:
+            level_2_record.draw(screen, Color=WHITE)
+        else:
+            level_2_record.draw(screen, Color=RED)
+    except KeyError:
         level_2_record.draw(screen, Color=WHITE)
-    else:
-        level_2_record.draw(screen, Color=RED)
 
     if dict["is_red_key"] == 0:
         picture_1_image = pygame.image.load("Textures/hud_keyRed_disabled.png")
@@ -351,6 +357,15 @@ def achievements_menu(bg, screen):
     else:
         picture_1_image = pygame.image.load("Textures/hud_keyRed.png")
         picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*8))
+        screen.blit(picture_1_image, picture_1_image_rect)
+
+    if dict["is_yellow_key"] == 0:
+        picture_1_image = pygame.image.load("Textures/hud_keyYellow_disabled.png")
+        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*20))
+        screen.blit(picture_1_image, picture_1_image_rect)
+    else:
+        picture_1_image = pygame.image.load("Textures/hud_keyYellow.png")
+        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*20))
         screen.blit(picture_1_image, picture_1_image_rect)
 
     back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
@@ -821,17 +836,19 @@ def level_2(bg, screen):
     archer_enemy_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 11, enemy_image="enemy_2")
     archer_enemy_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, enemy_image="enemy_2_90")
 
-    hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
-    # hero = Player(WIN_WIDTH - PLATFORM_WIDTH*18, WIN_HEIGHT - PLATFORM_HEIGHT * 9)  # создаем героя по
+    # hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
+    hero = Player(PLATFORM_WIDTH*15, PLATFORM_HEIGHT * 9)  # создаем героя по
     # (x,y) координатам
     left = right = False  # по умолчанию — стоим
     Up = False
 
     einstein = False
     red_key = False
+    yellow_key = False
 
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
+    disappear_platforms = []
     passes_in_level = []
     level_exits = []
     enemies = []
@@ -841,7 +858,8 @@ def level_2(bg, screen):
     bullets_4 = []
     bullets_5 = []
     lavas = []
-    keys = []
+    redkeys = []
+    yellowkeys = []
     gallery_features = []
 
     date_time_obj1 = datetime.datetime.now()
@@ -888,7 +906,7 @@ def level_2(bg, screen):
                         if col == "/":
                             level_exit = Platform(x, y, "exit_door_180")
                             entities.add(level_exit)
-                            level_exits.append(level_exit)
+                            platforms.append(level_exit)
                         if col == "p":
                             pass_in_level = Platform(x, y, "pass_2")
                             entities.add(pass_in_level)
@@ -901,17 +919,30 @@ def level_2(bg, screen):
                             lava = Platform(x, y, "lava_erase")
                             entities.add(lava)
                             lavas.append(lava)
-                        if dict["is_red_key"] == 1 and red_key:
+                        if col == "+":
+                            sdv = Platform(x+PLATFORM_WIDTH/8, y+PLATFORM_HEIGHT/8, "platform")
+                            entities.add(sdv)
+                            platforms.append(sdv)
+                        if dict["is_red_key"] == 1:
                             if col == "k":
                                 key = Platform(x, y, "keyRed")
                                 entities.add(key)
-                                keys.append(key)
+                                redkeys.append(key)
+                        if col == "K":
+                            yellowkey = Platform(x, y, "keyYellow")
+                            entities.add(yellowkey)
+                            yellowkeys.append(yellowkey)
                         if not is_einstein:
                             if col == "c":
                                 gallery_einstein = "gallery_einstein"
                                 gallery_feature = Platform(x, y, gallery_einstein)
                                 entities.add(gallery_feature)
                                 gallery_features.append(gallery_feature)
+                        if not red_key:
+                            if col == "d":
+                                platf = Platform(x, y, "platform")
+                                entities.add(platf)
+                                disappear_platforms.append(platf)
 
                         x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
                     y += PLATFORM_HEIGHT  # то же самое и с высотой
@@ -1003,6 +1034,18 @@ def level_2(bg, screen):
                 date_time_obj2 = datetime.datetime.now()
                 time_delta = date_time_obj2 - date_time_obj1
                 seconds = time_delta.total_seconds()
+
+                for k in redkeys:
+                    if sprite.collide_rect(hero, k):
+                        entities.remove(key)
+                        red_key = True
+                        entities.remove(platf)
+                        disappear_platforms.clear()
+                for K in yellowkeys:
+                    if sprite.collide_rect(hero, K):
+                        entities.remove(yellowkey)
+                        yellowkeys.remove(yellowkey)
+                        yellow_key = True
 
                 if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
                     bullet_1 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 5, 10, "bomb_erase")
@@ -1159,6 +1202,9 @@ def level_2(bg, screen):
                         except KeyError:
                             dict["your_time_seconds_2"] = your_time_seconds
 
+                        if yellow_key:
+                            dict["is_yellow_key"] = 1
+
                         if einstein:
                             is_einstein = 1
                             dict["is_einstein"] = 1
@@ -1176,10 +1222,6 @@ def level_2(bg, screen):
                     if sprite.collide_rect(hero, g):
                         entities.remove(gallery_feature)
                         einstein = True
-                for k in keys:
-                    if sprite.collide_rect(hero, k):
-                        entities.remove(key)
-                        red_key = True
                 # for pa in passes_in_level:
                 #     if sprite.collide_rect(hero, pa):
                 #         part_1 = False

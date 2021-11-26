@@ -42,10 +42,12 @@ is_gallery_menu = False
 menu_music = False
 is_levels = False
 is_game_over = False
+is_pass_level_screen = False
 running_1 = 0
 running_2 = 0
 is_pause_menu = False
 switch_pause = False
+is_restart = False
 
 up = False
 timer = pygame.time.Clock()
@@ -304,11 +306,14 @@ def pause_menu(bg, screen):
     global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, date_time_obj4
     pygame.mixer.music.pause()
 
+    pause_bg = pygame.image.load("Textures/pause_bg.png")
+    screen.blit(pause_bg, (PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 1))
+
     continue_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                              WIN_HEIGHT / 15, 'Continue')
     continue_button.draw(screen)
 
-    menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
+    menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Menu')
     menu_button.draw(screen)
 
@@ -393,7 +398,85 @@ def game_over(bg, screen):
                     is_game_over = False
                     run = False
     pygame.display.update()
-    return is_menu, running_1, is_game_over, menu_music
+    return is_menu, running_1, is_game_over, menu_music, running_2
+
+
+def restart():
+    global running_1, running_2, is_restart, is_menu, Number_of_level
+    is_menu = False
+    if Number_of_level == 1:
+        running_1 = 1
+    elif Number_of_level == 2:
+        running_2 = 1
+    is_restart = False
+
+
+def pass_level_screen(bg, screen, your_time):
+    global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, \
+        date_time_obj4, is_pass_level_screen, is_restart
+
+    pause_bg = pygame.image.load("Textures/pause_bg.png")
+    screen.blit(pause_bg, (PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 1))
+
+    next_level_button = Button(RED, PLATFORM_WIDTH*20, WIN_HEIGHT / 6 - WIN_HEIGHT / 27,
+                               PLATFORM_WIDTH*8,
+                               WIN_HEIGHT / 15, 'Next_level')
+    next_level_button.draw(screen, size=48)
+
+    what_time_button = Button(RED, PLATFORM_WIDTH * 24, PLATFORM_HEIGHT*13, 0.000001,
+                              0.000001, f'{your_time}')
+    what_time_button.draw(screen, size=48, Color=WHITE)
+
+    restart_button = Button(RED, PLATFORM_WIDTH * 21, PLATFORM_HEIGHT*8, PLATFORM_WIDTH*6,
+                              PLATFORM_HEIGHT*2, 'Restart')
+    restart_button.draw(screen, size=48)
+
+    menu_button = Button(RED, WIN_WIDTH / 2 - PLATFORM_WIDTH * 2, WIN_HEIGHT / 2 + PLATFORM_HEIGHT*2, PLATFORM_WIDTH * 4,
+                         WIN_HEIGHT / 15, 'Menu')
+    menu_button.draw(screen, size=48)
+
+    pygame.display.update()
+
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if next_level_button.is_pressed(mouse_pos, mouse_pressed):
+                    dt = datetime.datetime.now() - datetime.datetime.now()
+                    if Number_of_level == 1:
+                        running_1 = 0
+                        is_pass_level_screen = False
+                        running_2 = 1
+                    # elif Number_of_level == 2:
+                    #     running_2 = 0
+                    #     is_pass_level_screen = False
+                    run = False
+                if menu_button.is_pressed(mouse_pos, mouse_pressed):
+                    dt = datetime.datetime.now() - datetime.datetime.now()
+                    is_menu = True
+                    running_1 = 0
+                    is_pass_level_screen = False
+                    menu_music = False
+                    run = False
+                if restart_button.is_pressed(mouse_pos, mouse_pressed):
+                    dt = datetime.datetime.now() - datetime.datetime.now()
+                    if Number_of_level == 1:
+                        is_restart = True
+                        running_1 = 0
+                        is_pass_level_screen = False
+                    if Number_of_level == 2:
+                        is_restart = True
+                        is_pass_level_screen = False
+                        running_2 = 0
+                    run = False
+        pygame.display.update()
+    pygame.mixer.music.unpause()
+    return running_1, is_menu, switch_pause, dt, is_pass_level_screen, running_2
 
 
 def level_1(bg, screen):
@@ -403,7 +486,8 @@ def level_1(bg, screen):
     :param screen:
     :return:
     """
-    global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels, dict, switch_pause, date_time_obj4
+    global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels, dict, \
+        switch_pause, date_time_obj4, is_pass_level_screen
     Number_of_level = 1
 
     date_time_obj1 = datetime.datetime.now()
@@ -549,10 +633,13 @@ def level_1(bg, screen):
                             dict["is_landay"] = 1
                         with open("saves.json", 'w') as f:
                             json.dump(dict, f)
+
+                        your_time = time_delta_2
                         menu_music = False
-                        running_1 = 0
+                        is_pass_level_screen = True
+                        while is_pass_level_screen:
+                            pass_level_screen(bg, screen, your_time)
                         run = False
-                        is_menu = True
                 for g in gallery_features:
                     if sprite.collide_rect(hero, g):
                         entities.remove(gallery_feature)
@@ -572,7 +659,8 @@ def level_1(bg, screen):
         elif running_1 == 0:
             run = False
 
-    return is_game_over, running_1, is_landay, is_menu, menu_music, Number_of_level, amount_passed_levels, switch_pause
+    return is_game_over, running_1, is_landay, is_menu, menu_music, Number_of_level, amount_passed_levels, \
+           switch_pause, is_pass_level_screen
 
 
 def level_2(bg, screen):
@@ -582,7 +670,8 @@ def level_2(bg, screen):
     :param screen:
     :return:
     """
-    global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level, dict, switch_pause, date_time_obj4, dt
+    global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level, dict, switch_pause, \
+        date_time_obj4, dt, is_pass_level_screen
     Number_of_level = 2
 
     pygame.mixer.music.set_volume(dict["music_volume"])
@@ -912,12 +1001,12 @@ def level_2(bg, screen):
                 entities.draw(screen)  # отображение
 
                 date_time_obj3 = datetime.datetime.now()
-                    # .strftime("%M:%S")
+                # .strftime("%M:%S")
                 time_delta_2 = date_time_obj3 - date_time_obj1 - dt
 
-                time_button = Button(RED, PLATFORM_WIDTH*43, PLATFORM_HEIGHT/2,
-                                      0.000001,
-                                      0.000001, f'{time_delta_2}')
+                time_button = Button(RED, PLATFORM_WIDTH * 43, PLATFORM_HEIGHT / 2,
+                                     0.000001,
+                                     0.000001, f'{time_delta_2}')
                 time_button.draw(screen, Color=WHITE, size=36)
 
                 for e in level_exits:
@@ -929,10 +1018,12 @@ def level_2(bg, screen):
                             with open("saves.json", 'w') as f:
                                 json.dump(dict, f)
 
+                        your_time = time_delta_2
                         menu_music = False
-                        running_2 = 0
+                        is_pass_level_screen = True
+                        while is_pass_level_screen:
+                            pass_level_screen(bg, screen, your_time)
                         run = False
-                        is_menu = True
                 for g in gallery_features:
                     if sprite.collide_rect(hero, g):
                         entities.remove(gallery_feature)
@@ -995,6 +1086,8 @@ def main():
         elif is_game_over:
             while is_game_over:
                 game_over(bg, screen)
+        elif is_restart:
+            restart()
         else:
             runnin = False
 

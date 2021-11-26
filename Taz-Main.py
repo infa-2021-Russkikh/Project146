@@ -48,6 +48,7 @@ running_2 = 0
 is_pause_menu = False
 switch_pause = False
 is_restart = False
+is_achievements_menu = False
 
 up = False
 timer = pygame.time.Clock()
@@ -60,33 +61,37 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict
+    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict, is_achievements_menu
     if not menu_music:
         pygame.mixer.music.set_volume(dict["music_volume"])
         pygame.mixer.music.load("Music/menu_music.mp3")
         pygame.mixer.music.play(-1)
-    bg = pygame.image.load("Textures/additional task.png")
+    # bg = pygame.image.load("Textures/additional task.png")
     # screen.blit(bg, (0, 0))
     screen.fill(Color(GREEN))
 
-    start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                          WIN_HEIGHT / 15, 'Start')
+    start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*2, WIN_WIDTH / 3.2,
+                          PLATFORM_HEIGHT*2, 'Start')
     start_button.draw(screen)
 
-    levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 3 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                           WIN_HEIGHT / 15, 'Levels')
+    levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*6, WIN_WIDTH / 3.2,
+                           PLATFORM_HEIGHT*2, 'Levels')
     levels_button.draw(screen)
 
-    options_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                            WIN_HEIGHT / 15, 'Options')
+    options_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*10, WIN_WIDTH / 3.2,
+                            PLATFORM_HEIGHT*2, 'Options')
     options_button.draw(screen)
 
-    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                            WIN_HEIGHT / 15, 'Gallery')
+    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*14, WIN_WIDTH / 3.2,
+                            PLATFORM_HEIGHT*2, 'Gallery')
     gallery_button.draw(screen)
 
-    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                         WIN_HEIGHT / 15, 'Quit')
+    achievements_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*18,
+                                 WIN_WIDTH / 3.2, PLATFORM_HEIGHT*2, 'Achievements')
+    achievements_button.draw(screen)
+
+    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*22, WIN_WIDTH / 3.2,
+                         PLATFORM_HEIGHT*2, 'Quit')
     quit_button.draw(screen)
 
     pygame.display.update()
@@ -122,6 +127,11 @@ def menu(bg, screen):
                     is_menu = False
                     menu_music = True
                     is_options_menu = True
+                    run = False
+                if achievements_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = False
+                    menu_music = True
+                    is_achievements_menu = True
                     run = False
     pygame.display.update()
     return running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu
@@ -296,6 +306,54 @@ def options_menu(bg, screen):
         return is_options_menu, is_menu, menu_music, is_landay, amount_passed_levels
 
 
+def achievements_menu(bg, screen):
+    global is_menu, menu_music, is_achievements_menu, dict
+
+    screen.fill(Color(GREEN))
+
+    level_1_name = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 3, PLATFORM_WIDTH,
+                          PLATFORM_HEIGHT, 'level 1')
+    level_2_name = Button(GREEN, PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 3, PLATFORM_WIDTH,
+                          PLATFORM_HEIGHT, 'level 2')
+
+    try:
+        level_1_record = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+                                PLATFORM_HEIGHT, f'{dict["your_time_seconds_1"]}')
+        level_2_record = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+                                PLATFORM_HEIGHT, f'{dict["your_time_seconds_2"]}')
+    except:
+        level_1_record = Button(GREEN, PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+                                PLATFORM_HEIGHT, "Empty -_-")
+        level_2_record = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+                                PLATFORM_HEIGHT, "Empty -_-")
+
+    level_1_record.draw(screen, Color=WHITE)
+    level_2_record.draw(screen, Color=WHITE)
+    level_1_name.draw(screen)
+    level_2_name.draw(screen)
+
+    back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                         WIN_HEIGHT / 15, 'Back')
+    back_button.draw(screen)
+
+    pygame.display.update()
+
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if back_button.is_pressed(mouse_pos, mouse_pressed):
+                    is_menu = True
+                    is_achievements_menu = False
+                    run = False
+        return is_achievements_menu, is_menu, menu_music
+
+
 def pause_menu(bg, screen):
     """
 
@@ -418,20 +476,21 @@ def pass_level_screen(bg, screen, your_time):
     pause_bg = pygame.image.load("Textures/pause_bg.png")
     screen.blit(pause_bg, (PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 1))
 
-    next_level_button = Button(RED, PLATFORM_WIDTH*20, WIN_HEIGHT / 6 - WIN_HEIGHT / 27,
-                               PLATFORM_WIDTH*8,
+    next_level_button = Button(RED, PLATFORM_WIDTH * 20, WIN_HEIGHT / 6 - WIN_HEIGHT / 27,
+                               PLATFORM_WIDTH * 8,
                                WIN_HEIGHT / 15, 'Next_level')
     next_level_button.draw(screen, size=48)
 
-    what_time_button = Button(RED, PLATFORM_WIDTH * 24, PLATFORM_HEIGHT*13, 0.000001,
+    what_time_button = Button(RED, PLATFORM_WIDTH * 24, PLATFORM_HEIGHT * 13, 0.000001,
                               0.000001, f'{your_time}')
     what_time_button.draw(screen, size=48, Color=WHITE)
 
-    restart_button = Button(RED, PLATFORM_WIDTH * 21, PLATFORM_HEIGHT*8, PLATFORM_WIDTH*6,
-                              PLATFORM_HEIGHT*2, 'Restart')
+    restart_button = Button(RED, PLATFORM_WIDTH * 21, PLATFORM_HEIGHT * 8, PLATFORM_WIDTH * 6,
+                            PLATFORM_HEIGHT * 2, 'Restart')
     restart_button.draw(screen, size=48)
 
-    menu_button = Button(RED, WIN_WIDTH / 2 - PLATFORM_WIDTH * 2, WIN_HEIGHT / 2 + PLATFORM_HEIGHT*2, PLATFORM_WIDTH * 4,
+    menu_button = Button(RED, WIN_WIDTH / 2 - PLATFORM_WIDTH * 2, WIN_HEIGHT / 2 + PLATFORM_HEIGHT * 2,
+                         PLATFORM_WIDTH * 4,
                          WIN_HEIGHT / 15, 'Menu')
     menu_button.draw(screen, size=48)
 
@@ -627,6 +686,17 @@ def level_1(bg, screen):
                 for e in level_exits:
                     if sprite.collide_rect(hero, e):
                         amount_passed_levels = 1
+                        your_time = time_delta_2
+
+                        timestr = f'{your_time}'
+                        ftr = [3600, 60, 1, 10 ** (-6)]
+                        your_time_seconds = sum([a * b for a, b in zip(ftr, map(float, timestr.split(':')))])
+                        try:
+                            if your_time_seconds < dict["your_time_seconds_1"]:
+                                dict["your_time_seconds_1"] = your_time_seconds
+                        except:
+                            dict["your_time_seconds_1"] = your_time_seconds
+
                         dict["amount_passed_levels"] = 1
                         if landay:
                             is_landay = 1
@@ -634,7 +704,6 @@ def level_1(bg, screen):
                         with open("saves.json", 'w') as f:
                             json.dump(dict, f)
 
-                        your_time = time_delta_2
                         menu_music = False
                         is_pass_level_screen = True
                         while is_pass_level_screen:
@@ -1012,13 +1081,22 @@ def level_2(bg, screen):
                 for e in level_exits:
                     if sprite.collide_rect(hero, e):
 
+                        your_time = time_delta_2
+                        timestr = f'{your_time}'
+                        ftr = [3600, 60, 1, 10 ** (-6)]
+                        your_time_seconds = sum([a * b for a, b in zip(ftr, map(float, timestr.split(':')))])
+                        try:
+                            if your_time_seconds < dict["your_time_seconds_2"]:
+                                dict["your_time_seconds_2"] = your_time_seconds
+                        except:
+                            dict["your_time_seconds_2"] = your_time_seconds
+
                         if einstein:
                             is_einstein = 1
                             dict["is_einstein"] = 1
                             with open("saves.json", 'w') as f:
                                 json.dump(dict, f)
 
-                        your_time = time_delta_2
                         menu_music = False
                         is_pass_level_screen = True
                         while is_pass_level_screen:
@@ -1088,6 +1166,9 @@ def main():
                 game_over(bg, screen)
         elif is_restart:
             restart()
+        elif is_achievements_menu:
+            while is_achievements_menu:
+                achievements_menu(bg, screen)
         else:
             runnin = False
 

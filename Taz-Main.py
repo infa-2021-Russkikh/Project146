@@ -21,6 +21,7 @@ FPS = 60
 RED = (255, 0, 0)
 GREEN = (0, 155, 55)
 GREY = (50, 50, 50)
+dt = datetime.datetime.now() - datetime.datetime.now()
 # PLATFORM_WIDTH = WIN_WIDTH / 48
 # PLATFORM_HEIGHT = WIN_HEIGHT / 25.25
 # PLATFORM_COLOR = "#FF6262"
@@ -44,6 +45,7 @@ is_game_over = False
 running_1 = 0
 running_2 = 0
 is_pause_menu = False
+switch_pause = False
 
 up = False
 timer = pygame.time.Clock()
@@ -299,7 +301,7 @@ def pause_menu(bg, screen):
     :param screen:
     :return:
     """
-    global running_1, is_menu, Number_of_level, running_2, menu_music
+    global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, date_time_obj4
     pygame.mixer.music.pause()
 
     continue_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
@@ -324,10 +326,13 @@ def pause_menu(bg, screen):
                 if continue_button.is_pressed(mouse_pos, mouse_pressed):
                     if Number_of_level == 1:
                         running_1 = 1
+                        dt += datetime.datetime.now() - date_time_obj4
                     elif Number_of_level == 2:
                         running_2 = 1
+                        dt += datetime.datetime.now() - date_time_obj4
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
+                    dt = datetime.datetime.now() - datetime.datetime.now()
                     is_menu = True
                     running_1 = 0
                     running_2 = 0
@@ -335,7 +340,7 @@ def pause_menu(bg, screen):
                     run = False
         pygame.display.update()
     pygame.mixer.music.unpause()
-    return running_1, is_menu
+    return running_1, is_menu, switch_pause, dt, date_time_obj4
 
 
 def game_over(bg, screen):
@@ -345,7 +350,10 @@ def game_over(bg, screen):
     :param screen:
     :return:
     """
-    global is_menu, running_1, is_game_over, running_2, Number_of_level, dict, menu_music
+    global is_menu, running_1, is_game_over, running_2, Number_of_level, dict, menu_music, dt
+
+    dt = datetime.datetime.now() - datetime.datetime.now()
+
     pygame.mixer.music.set_volume(dict["music_volume"])
     pygame.mixer.music.load('Music/game_over.mp3')
     pygame.mixer.music.play()
@@ -395,15 +403,17 @@ def level_1(bg, screen):
     :param screen:
     :return:
     """
-    global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels, dict
+    global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels, dict, switch_pause, date_time_obj4
     Number_of_level = 1
+
+    date_time_obj1 = datetime.datetime.now()
 
     pygame.mixer.music.set_volume(dict["music_volume"])
     pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
     pygame.mixer.music.play(-1)
 
-    typical_enemy_1 = Enemy(WIN_WIDTH / 7, PLATFORM_HEIGHT*10)
-    typical_enemy_2 = Enemy(WIN_WIDTH - PLATFORM_WIDTH*7.5, PLATFORM_HEIGHT*5)
+    typical_enemy_1 = Enemy(WIN_WIDTH / 7, PLATFORM_HEIGHT * 10)
+    typical_enemy_2 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 7.5, PLATFORM_HEIGHT * 5)
     typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, PLATFORM_HEIGHT * 7, 2)
     typical_enemy_4 = Enemy(WIN_WIDTH / 1.535, PLATFORM_HEIGHT * 20)
 
@@ -509,6 +519,7 @@ def level_1(bg, screen):
                     left = False
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
                     running_1 = 2
+                    switch_pause = True
 
             hero.collide_enemy(enemies, hero)
             if hero.health > 0:
@@ -519,6 +530,15 @@ def level_1(bg, screen):
                 typical_enemy_3.update(26)
                 typical_enemy_4.update(35)
                 entities.draw(screen)  # отображение
+
+                date_time_obj3 = datetime.datetime.now()
+                # .strftime("%M:%S")
+                time_delta_2 = date_time_obj3 - date_time_obj1 - dt
+
+                time_button = Button(RED, PLATFORM_WIDTH * 43, PLATFORM_HEIGHT / 2,
+                                     0.000001,
+                                     0.000001, f'{time_delta_2}')
+                time_button.draw(screen, Color=WHITE, size=36)
 
                 for e in level_exits:
                     if sprite.collide_rect(hero, e):
@@ -544,12 +564,15 @@ def level_1(bg, screen):
                 game_over(bg, screen)
             pygame.display.update()  # обновление и вывод всех изменений на экран
         elif running_1 == 2:
+            if switch_pause:
+                date_time_obj4 = datetime.datetime.now()
+                switch_pause = False
             while running_1 == 2:
                 pause_menu(bg, screen)
         elif running_1 == 0:
             run = False
 
-    return is_game_over, running_1, is_landay, is_menu, menu_music, Number_of_level, amount_passed_levels
+    return is_game_over, running_1, is_landay, is_menu, menu_music, Number_of_level, amount_passed_levels, switch_pause
 
 
 def level_2(bg, screen):
@@ -559,7 +582,7 @@ def level_2(bg, screen):
     :param screen:
     :return:
     """
-    global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level, dict
+    global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level, dict, switch_pause, date_time_obj4, dt
     Number_of_level = 2
 
     pygame.mixer.music.set_volume(dict["music_volume"])
@@ -638,7 +661,7 @@ def level_2(bg, screen):
                             platforms.append(pf)
                         if col == "=":
                             # создаем блок, заливаем его цветом и рисуем его
-                            pfo = Platform(x, y+PLATFORM_HEIGHT/10, "platform")
+                            pfo = Platform(x, y + PLATFORM_HEIGHT / 10, "platform")
                             entities.add(pfo)
                             platforms.append(pfo)
                         if col == "/":
@@ -735,6 +758,7 @@ def level_2(bg, screen):
                 if event.type == KEYUP and event.key == K_a:
                     left = False
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
+                    switch_pause = True
                     running_2 = 2
 
             hero.collide_enemy(enemies, hero)
@@ -820,7 +844,7 @@ def level_2(bg, screen):
                     c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
 
                 if len(bullets_3) > 0:
-                    if c_3 > PLATFORM_HEIGHT*4 and len(bullets_3) != 0:
+                    if c_3 > PLATFORM_HEIGHT * 4 and len(bullets_3) != 0:
                         enemies.remove(bullet_3)
                         entities.remove(bullet_3)
                         bullets_3.remove(bullet_3)
@@ -846,7 +870,7 @@ def level_2(bg, screen):
                     c_4 = (dx_4 ** 2 + dy_4 ** 2) ** 0.5
 
                 if len(bullets_4) > 0:
-                    if c_4 > PLATFORM_HEIGHT*4 and len(bullets_4) != 0:
+                    if c_4 > PLATFORM_HEIGHT * 4 and len(bullets_4) != 0:
                         enemies.remove(bullet_4)
                         entities.remove(bullet_4)
                         bullets_4.remove(bullet_4)
@@ -872,7 +896,7 @@ def level_2(bg, screen):
                     c_5 = (dx_5 ** 2 + dy_5 ** 2) ** 0.5
 
                 if len(bullets_5) > 0:
-                    if c_5 > PLATFORM_HEIGHT*4 and len(bullets_5) != 0:
+                    if c_5 > PLATFORM_HEIGHT * 4 and len(bullets_5) != 0:
                         enemies.remove(bullet_5)
                         entities.remove(bullet_5)
                         bullets_5.remove(bullet_5)
@@ -886,6 +910,15 @@ def level_2(bg, screen):
                         bullets_5.remove(bullet_5)
 
                 entities.draw(screen)  # отображение
+
+                date_time_obj3 = datetime.datetime.now()
+                    # .strftime("%M:%S")
+                time_delta_2 = date_time_obj3 - date_time_obj1 - dt
+
+                time_button = Button(RED, PLATFORM_WIDTH*43, PLATFORM_HEIGHT/2,
+                                      0.000001,
+                                      0.000001, f'{time_delta_2}')
+                time_button.draw(screen, Color=WHITE, size=36)
 
                 for e in level_exits:
                     if sprite.collide_rect(hero, e):
@@ -919,12 +952,15 @@ def level_2(bg, screen):
                 game_over(bg, screen)
             pygame.display.update()  # обновление и вывод всех изменений на экран
         elif running_2 == 2:
+            if switch_pause:
+                date_time_obj4 = datetime.datetime.now()
+                switch_pause = False
             while running_2 == 2:
                 pause_menu(bg, screen)
         elif running_2 == 0:
             run = False
 
-    return is_game_over, running_2, is_einstein, is_menu, menu_music
+    return is_game_over, running_2, is_einstein, is_menu, menu_music, switch_pause, dt
 
 
 def main():

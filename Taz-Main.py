@@ -412,15 +412,15 @@ def pause_menu(bg, screen):
     pause_bg = pygame.image.load("Textures/pause_bg.png")
     screen.blit(pause_bg, (PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 1))
 
-    continue_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                             WIN_HEIGHT / 15, 'Continue')
+    continue_button = Button(RED, PLATFORM_WIDTH * 20, WIN_HEIGHT / 6 - WIN_HEIGHT / 27, PLATFORM_WIDTH*8,
+                             PLATFORM_HEIGHT*2, 'Continue')
     continue_button.draw(screen)
 
-    menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2, WIN_WIDTH / 3.2,
-                         WIN_HEIGHT / 15, 'Menu')
+    menu_button = Button(RED, PLATFORM_WIDTH * 20, WIN_HEIGHT / 2, PLATFORM_WIDTH*8,
+                         PLATFORM_HEIGHT*2, 'Menu')
     menu_button.draw(screen)
 
-    restart_button = Button(RED, PLATFORM_WIDTH * 21, PLATFORM_HEIGHT * 8, PLATFORM_WIDTH * 6,
+    restart_button = Button(RED, PLATFORM_WIDTH * 20, PLATFORM_HEIGHT * 8, PLATFORM_WIDTH*8,
                             PLATFORM_HEIGHT * 2, 'Restart')
     restart_button.draw(screen)
 
@@ -504,6 +504,14 @@ def game_over(bg, screen):
         for even in pygame.event.get():  # Обрабатываем события
             if even.type == QUIT:
                 raise SystemExit("QUIT")
+            if even.type == KEYDOWN and even.key == K_r:
+                is_menu = False
+                if Number_of_level == 1:
+                    running_1 = 1
+                elif Number_of_level == 2:
+                    running_2 = 1
+                is_game_over = False
+                run = False
             if even.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 mouse_pressed = pygame.mouse.get_pressed()

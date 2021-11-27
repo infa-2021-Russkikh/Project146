@@ -74,28 +74,28 @@ def menu(bg, screen):
     with open("saves.json", 'r') as f:
         dict = json.load(f)
 
-    start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*2, WIN_WIDTH / 3.2,
-                          PLATFORM_HEIGHT*2, 'Start')
+    start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 2, WIN_WIDTH / 3.2,
+                          PLATFORM_HEIGHT * 2, 'Start')
     start_button.draw(screen)
 
-    levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*6, WIN_WIDTH / 3.2,
-                           PLATFORM_HEIGHT*2, 'Levels')
+    levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 6, WIN_WIDTH / 3.2,
+                           PLATFORM_HEIGHT * 2, 'Levels')
     levels_button.draw(screen)
 
-    options_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*10, WIN_WIDTH / 3.2,
-                            PLATFORM_HEIGHT*2, 'Options')
+    options_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 10, WIN_WIDTH / 3.2,
+                            PLATFORM_HEIGHT * 2, 'Options')
     options_button.draw(screen)
 
-    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*14, WIN_WIDTH / 3.2,
-                            PLATFORM_HEIGHT*2, 'Gallery')
+    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 14, WIN_WIDTH / 3.2,
+                            PLATFORM_HEIGHT * 2, 'Gallery')
     gallery_button.draw(screen)
 
-    achievements_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*18,
-                                 WIN_WIDTH / 3.2, PLATFORM_HEIGHT*2, 'Achievements')
+    achievements_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 18,
+                                 WIN_WIDTH / 3.2, PLATFORM_HEIGHT * 2, 'Achievements')
     achievements_button.draw(screen)
 
-    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*22, WIN_WIDTH / 3.2,
-                         PLATFORM_HEIGHT*2, 'Quit')
+    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 22, WIN_WIDTH / 3.2,
+                         PLATFORM_HEIGHT * 2, 'Quit')
     quit_button.draw(screen)
 
     pygame.display.update()
@@ -352,24 +352,32 @@ def achievements_menu(bg, screen):
 
     if dict["is_red_key"] == 0:
         picture_1_image = pygame.image.load("Textures/hud_keyRed_disabled.png")
-        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*8))
+        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 8))
         screen.blit(picture_1_image, picture_1_image_rect)
     else:
         picture_1_image = pygame.image.load("Textures/hud_keyRed.png")
-        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*8))
+        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 8))
         screen.blit(picture_1_image, picture_1_image_rect)
 
     if dict["is_yellow_key"] == 0:
         picture_1_image = pygame.image.load("Textures/hud_keyYellow_disabled.png")
-        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*20))
+        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 20))
         screen.blit(picture_1_image, picture_1_image_rect)
     else:
         picture_1_image = pygame.image.load("Textures/hud_keyYellow.png")
-        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH*6, PLATFORM_HEIGHT*20))
+        picture_1_image_rect = picture_1_image.get_rect(center=(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 20))
         screen.blit(picture_1_image, picture_1_image_rect)
 
-    back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                         WIN_HEIGHT / 15, 'Back')
+    describe_yellow_key_left = Button(RED, PLATFORM_WIDTH * 4, PLATFORM_HEIGHT * 20, 0.00001,
+                                 0.00001, 'The')
+    describe_yellow_key_left.draw(screen, size=36, Color=WHITE)
+
+    describe_yellow_key = Button(RED,  PLATFORM_WIDTH*13, PLATFORM_HEIGHT*20, 0.00001,
+                         0.00001, 'open your second breath')
+    describe_yellow_key.draw(screen, size=36, Color=WHITE)
+
+    back_button = Button(RED, PLATFORM_WIDTH*3, PLATFORM_HEIGHT*22, PLATFORM_WIDTH*4,
+                         PLATFORM_HEIGHT*2, 'Back')
     back_button.draw(screen)
 
     pygame.display.update()
@@ -397,7 +405,7 @@ def pause_menu(bg, screen):
     :param screen:
     :return:
     """
-    global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, date_time_obj4,\
+    global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, date_time_obj4, \
         is_pass_level_screen, is_restart
     pygame.mixer.music.pause()
 
@@ -474,6 +482,11 @@ def game_over(bg, screen):
     pygame.mixer.music.play()
     screen.fill(Color(WHITE))
 
+    if dict["is_yellow_key"] == 0:
+        dict["health"] = 100
+    elif dict["is_yellow_key"] == 1:
+        dict["health"] = 200
+
     restart_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                             WIN_HEIGHT / 15, 'Restart')
     restart_button.draw(screen)
@@ -534,7 +547,7 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
     next_level_button.draw(screen, size=48)
     if Number_of_level == 1:
         on_record_time_button = Button(RED, PLATFORM_WIDTH * 30, PLATFORM_HEIGHT * 13, 0.000001,
-                                      0.000001, 'of 0:00:12:5')
+                                       0.000001, 'of 0:00:12:5')
         on_record_time_button.draw(screen, size=48, Color=WHITE)
 
         if your_time_seconds > 12.5:
@@ -624,6 +637,7 @@ def level_1(bg, screen):
     Number_of_level = 1
 
     date_time_obj1 = datetime.datetime.now()
+    invisible_time = FPS
 
     pygame.mixer.music.set_volume(dict["music_volume"])
     pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
@@ -634,7 +648,13 @@ def level_1(bg, screen):
     typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, PLATFORM_HEIGHT * 7, 2)
     typical_enemy_4 = Enemy(WIN_WIDTH / 1.535, PLATFORM_HEIGHT * 20)
 
-    hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)  # создаем героя по (x,y) координатам
+    if dict["is_yellow_key"] == 0:
+        hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)  # создаем героя по (x,y) координатам
+    elif dict["is_yellow_key"] == 1:
+        if dict["health"] == 200:
+            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT, HEALTH=200)
+        if dict["health"] == 100:
+            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)
     left = right = False  # по умолчанию — стоим
     Up = False
 
@@ -738,7 +758,12 @@ def level_1(bg, screen):
                     running_1 = 2
                     switch_pause = True
 
-            hero.collide_enemy(enemies, hero)
+            if invisible_time == 0:
+                hero.collide_enemy(enemies, hero)
+                invisible_time = FPS // 6
+            elif invisible_time > 0:
+                invisible_time -= 1
+
             if hero.health > 0:
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
@@ -747,6 +772,18 @@ def level_1(bg, screen):
                 typical_enemy_3.update(26)
                 typical_enemy_4.update(35)
                 entities.draw(screen)  # отображение
+
+                if hero.health == 100:
+                    xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(xp, (PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                    if dict["is_yellow_key"] == 1:
+                        empty_double_xp = pygame.image.load("Textures/hud_heartEmpty.png")
+                        screen.blit(empty_double_xp, (5 * PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                elif hero.health == 200:
+                    xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(xp, (PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                    double_xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(double_xp, (5 * PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
 
                 date_time_obj3 = datetime.datetime.now()
                 # .strftime("%M:%S")
@@ -774,6 +811,7 @@ def level_1(bg, screen):
                             dict["is_red_key"] = 1
 
                         dict["amount_passed_levels"] = 1
+                        dict["health"] = hero.health
                         if landay:
                             is_landay = 1
                             dict["is_landay"] = 1
@@ -837,7 +875,13 @@ def level_2(bg, screen):
     archer_enemy_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, enemy_image="enemy_2_90")
 
     # hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
-    hero = Player(PLATFORM_WIDTH*15, PLATFORM_HEIGHT * 9)  # создаем героя по
+    if dict["is_yellow_key"] == 0:
+        hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)  # создаем героя по (x,y) координатам
+    elif dict["is_yellow_key"] == 1:
+        if dict["health"] == 200:
+            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT, HEALTH=200)
+        if dict["health"] == 100:
+            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)
     # (x,y) координатам
     left = right = False  # по умолчанию — стоим
     Up = False
@@ -920,7 +964,7 @@ def level_2(bg, screen):
                             entities.add(lava)
                             lavas.append(lava)
                         if col == "+":
-                            sdv = Platform(x+PLATFORM_WIDTH/8, y+PLATFORM_HEIGHT/8, "platform")
+                            sdv = Platform(x + PLATFORM_WIDTH / 8, y + PLATFORM_HEIGHT / 8, "platform")
                             entities.add(sdv)
                             platforms.append(sdv)
                         if dict["is_red_key"] == 1:
@@ -1018,7 +1062,12 @@ def level_2(bg, screen):
                     switch_pause = True
                     running_2 = 2
 
-            hero.collide_enemy(enemies, hero)
+            if invisible_time == 0:
+                hero.collide_enemy(enemies, hero)
+                invisible_time = FPS // 6
+            elif invisible_time > 0:
+                invisible_time -= 1
+
             if hero.health > 0:
 
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
@@ -1180,6 +1229,18 @@ def level_2(bg, screen):
 
                 entities.draw(screen)  # отображение
 
+                if hero.health == 100:
+                    xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(xp, (PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                    if dict["is_yellow_key"] == 1:
+                        empty_double_xp = pygame.image.load("Textures/hud_heartEmpty.png")
+                        screen.blit(empty_double_xp, (5 * PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                elif hero.health == 200:
+                    xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(xp, (PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                    double_xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(double_xp, (5 * PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+
                 date_time_obj3 = datetime.datetime.now()
                 # .strftime("%M:%S")
                 time_delta_2 = date_time_obj3 - date_time_obj1 - dt
@@ -1205,13 +1266,16 @@ def level_2(bg, screen):
                         if yellow_key:
                             dict["is_yellow_key"] = 1
 
+                        dict["amount_passed_levels"] = 2
+                        dict["health"] = hero.health
+
                         if einstein:
                             is_einstein = 1
                             dict["is_einstein"] = 1
-                            with open("saves.json", 'w') as foo:
-                                json.dump(dict, foo)
-                            with open("saves.json", 'r') as foo:
-                                dict = json.load(foo)
+                        with open("saves.json", 'w') as foo:
+                            json.dump(dict, foo)
+                        with open("saves.json", 'r') as foo:
+                            dict = json.load(foo)
 
                         menu_music = False
                         is_pass_level_screen = True

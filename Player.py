@@ -133,7 +133,7 @@ class Player(sprite.Sprite):
     def collide_enemy(self, enemies, hero):
         for en in enemies:
             if sprite.collide_rect(self, en):
-                hero.health = 0
+                hero.health -= 100
 
     # def get_hurt(self, yvel, health, platforms):  # получение урона от падения
     #     for p in platforms:

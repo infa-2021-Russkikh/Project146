@@ -861,6 +861,8 @@ def level_2(bg, screen):
     pygame.mixer.music.load("Music/Office_Passenger_Dirty_Love.mp3")
     pygame.mixer.music.play(-1)
 
+    invisible_time = 0
+
     typical_enemy_1 = Enemy(PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 23, 3)
     typical_enemy_2 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 8, PLATFORM_HEIGHT * 3, 2)
     typical_enemy_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 13, PLATFORM_HEIGHT * 3)

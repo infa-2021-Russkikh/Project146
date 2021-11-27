@@ -878,12 +878,12 @@ def level_2(bg, screen):
 
     # hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
     if dict["is_yellow_key"] == 0:
-        hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)  # создаем героя по (x,y) координатам
+        hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
     elif dict["is_yellow_key"] == 1:
         if dict["health"] == 200:
-            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT, HEALTH=200)
+            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7, HEALTH=200)
         if dict["health"] == 100:
-            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)
+            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)
     # (x,y) координатам
     left = right = False  # по умолчанию — стоим
     Up = False

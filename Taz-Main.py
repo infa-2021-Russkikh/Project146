@@ -644,7 +644,7 @@ def level_1(bg, screen):
         switch_pause, date_time_obj4, is_pass_level_screen, is_red_key
     Number_of_level = 1
 
-    # date_time_obj1 = datetime.datetime.now()
+    date_time_obj1 = datetime.datetime.now()
     invisible_time = FPS
 
     pygame.mixer.music.set_volume(dict["music_volume"])
@@ -731,8 +731,6 @@ def level_1(bg, screen):
         y += PLATFORM_HEIGHT  # то же самое и с высотой
         x = 0
 
-    tm = True
-
     run = True
     while run:
         timer.tick(FPS)
@@ -756,9 +754,6 @@ def level_1(bg, screen):
                     right = True
                 if event.type == KEYDOWN and event.key == K_d:
                     right = True
-                    if tm:
-                        date_time_obj1 = datetime.datetime.now()
-                        tm = False
                 if event.type == KEYUP and event.key == K_RIGHT:
                     right = False
                 if event.type == KEYUP and event.key == K_d:

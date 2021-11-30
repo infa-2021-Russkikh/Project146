@@ -430,7 +430,7 @@ def pause_menu(bg, screen):
     :return:
     """
     global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, date_time_obj4, \
-        is_pass_level_screen, is_restart
+        is_pass_level_screen, is_restart, running_3
     pygame.mixer.music.pause()
 
     pause_bg = pygame.image.load("Textures/pause_bg.png")
@@ -466,12 +466,16 @@ def pause_menu(bg, screen):
                     elif Number_of_level == 2:
                         running_2 = 1
                         dt += datetime.datetime.now() - date_time_obj4
+                    elif Number_of_level == 3:
+                        running_3 = 1
+                        dt += datetime.datetime.now() - date_time_obj4
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
                     dt = datetime.datetime.now() - datetime.datetime.now()
                     is_menu = True
                     running_1 = 0
                     running_2 = 0
+                    running_3 = 0
                     menu_music = False
                     run = False
                 if restart_button.is_pressed(mouse_pos, mouse_pressed):
@@ -484,6 +488,10 @@ def pause_menu(bg, screen):
                         is_restart = True
                         is_pass_level_screen = False
                         running_2 = 0
+                    if Number_of_level == 3:
+                        is_restart = True
+                        is_pass_level_screen = False
+                        running_3 = 0
                     run = False
         pygame.display.update()
     pygame.mixer.music.unpause()
@@ -497,7 +505,7 @@ def game_over(bg, screen):
     :param screen:
     :return:
     """
-    global is_menu, running_1, is_game_over, running_2, Number_of_level, dict, menu_music, dt
+    global is_menu, running_1, is_game_over, running_2, Number_of_level, dict, menu_music, dt, running_3
 
     dt = datetime.datetime.now() - datetime.datetime.now()
 
@@ -534,6 +542,8 @@ def game_over(bg, screen):
                     running_1 = 1
                 elif Number_of_level == 2:
                     running_2 = 1
+                elif Number_of_level == 3:
+                    running_3 = 1
                 is_game_over = False
                 run = False
             if even.type == MOUSEBUTTONDOWN:
@@ -545,6 +555,8 @@ def game_over(bg, screen):
                         running_1 = 1
                     elif Number_of_level == 2:
                         running_2 = 1
+                    elif Number_of_level == 3:
+                        running_3 = 1
                     is_game_over = False
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
@@ -557,12 +569,14 @@ def game_over(bg, screen):
 
 
 def restart():
-    global running_1, running_2, is_restart, is_menu, Number_of_level
+    global running_1, running_2, is_restart, is_menu, Number_of_level, running_3
     is_menu = False
     if Number_of_level == 1:
         running_1 = 1
     elif Number_of_level == 2:
         running_2 = 1
+    elif Number_of_level == 3:
+        running_3 = 1
     is_restart = False
 
 
@@ -1368,58 +1382,59 @@ def level_3(bg, screen):
     """
     global is_game_over, running_3, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels, dict, \
         switch_pause, date_time_obj4, is_pass_level_screen
-    Number_of_level = 1
+    Number_of_level = 3
 
     date_time_obj1 = datetime.datetime.now()
     invisible_time = FPS
 
     pygame.mixer.music.set_volume(dict["music_volume"])
-    # pygame.mixer.music.load("Music/chocolate-chip-by-uncle-morris.mp3")
+    pygame.mixer.music.load("Music/boss_music_1.mp3")
     pygame.mixer.music.play(-1)
 
     if dict["is_yellow_key"] == 0:
-        hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)  # создаем героя по (x,y) координатам
+        hero = Player(PLATFORM_WIDTH*3, WIN_HEIGHT - PLATFORM_HEIGHT*4)  # создаем героя по (x,y) координатам
     elif dict["is_yellow_key"] == 1:
         if dict["health"] == 200:
-            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT, HEALTH=200)
+            hero = Player(PLATFORM_WIDTH*3, WIN_HEIGHT - PLATFORM_HEIGHT*4, HEALTH=200)
         if dict["health"] == 100:
-            hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT)
+            hero = Player(PLATFORM_WIDTH*3, WIN_HEIGHT - PLATFORM_HEIGHT*4)
     left = right = False  # по умолчанию — стоим
     Up = False
     entities = pygame.sprite.Group()  # Все объекты
     platforms = []  # то, во что мы будем врезаться или опираться
     level_exits = []
     enemies = []
+    lavas = []
     gallery_features = []
 
     entities.add(hero)
 
     level = [
-        "------------------------------------------------",
-        "-                                              -",
-        "-                                              -",
-        "-                             -                -",
-        "-             --   -       -                   -",
-        "-                      -                       -",
-        "-                                      ----    -",
-        "-              -                               -",
-        "-                                -----         -",
-        "-                                              -",
-        "-              -                               -",
-        "-    -----                            -        -",
-        "-                                              -",
-        "-          ----                                -",
-        "-                                         -    -",
-        "-                -                             -",
-        "-                   --                         -",
-        "-                                         -    -",
-        "-                                              -",
-        "-                      --            -         -",
-        "-                                              -",
-        "-                             ----             -",
-        "-                                              -",
-        "-                                              -",
-        "------------------------------------------------"]
+        "                                                ",
+        "                                                ",
+        "                                                ",
+        "      -                                         ",
+        "                                                ",
+        "            -                                   ",
+        "   <               -                            ",
+        "                                                ",
+        "           =                                    ",
+        "                      <                         ",
+        "       =                                        ",
+        "                                                ",
+        "              -   -   =                         ",
+        "                                                ",
+        "    -                                           ",
+        "            <                                   ",
+        "                     -                          ",
+        "       =                                        ",
+        "                                                ",
+        "                  <                             ",
+        "            -                                   ",
+        "   -                                            ",
+        "                                                ",
+        "                                                ",
+        "________________________________________________"]
 
     x = y = 0  # координаты
     for row in level:  # вся строка
@@ -1429,10 +1444,22 @@ def level_3(bg, screen):
                 pf = Platform(x, y)
                 entities.add(pf)
                 platforms.append(pf)
+            if col == "=":
+                pfo = Platform(x, y+PLATFORM_HEIGHT/2)
+                entities.add(pfo)
+                platforms.append(pfo)
+            if col == "<":
+                pfol = Platform(x-PLATFORM_WIDTH/2, y)
+                entities.add(pfol)
+                platforms.append(pfol)
             if col == "*":
                 level_exit = Platform(x, y, "exit_door")
                 entities.add(level_exit)
                 level_exits.append(level_exit)
+            if col == "_":
+                lava = Platform(x, y, "lava_erase")
+                entities.add(lava)
+                lavas.append(lava)
 
             x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
         y += PLATFORM_HEIGHT  # то же самое и с высотой
@@ -1470,7 +1497,7 @@ def level_3(bg, screen):
                 if event.type == KEYUP and event.key == K_a:
                     left = False
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
-                    running_1 = 2
+                    running_3 = 2
                     switch_pause = True
 
             if invisible_time == 0:
@@ -1504,6 +1531,10 @@ def level_3(bg, screen):
                                      0.000001,
                                      0.000001, f'{time_delta_2}')
                 time_button.draw(screen, Color=WHITE, size=36)
+
+                for l in lavas:
+                    if sprite.collide_rect(hero, l):
+                        hero.health = 0
 
                 for e in level_exits:
                     if sprite.collide_rect(hero, e):

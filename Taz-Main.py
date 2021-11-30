@@ -65,7 +65,8 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict, is_achievements_menu
+    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict, is_achievements_menu,\
+        running_2, running_3
     if not menu_music:
         pygame.mixer.music.set_volume(dict["music_volume"])
         pygame.mixer.music.load("Music/menu_music.mp3")
@@ -78,7 +79,7 @@ def menu(bg, screen):
         dict = json.load(f)
 
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 2, WIN_WIDTH / 3.2,
-                          PLATFORM_HEIGHT * 2, 'Start')
+                          PLATFORM_HEIGHT * 2, 'Start/Continue')
     start_button.draw(screen)
 
     levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 6, WIN_WIDTH / 3.2,
@@ -114,7 +115,12 @@ def menu(bg, screen):
                 if start_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = False
                     menu_music = False
-                    running_1 = True
+                    if amount_passed_levels == 0:
+                        running_1 = True
+                    if amount_passed_levels == 1:
+                        running_2 = True
+                    if amount_passed_levels == 2:
+                        running_3 = True
                     run = False
                 if quit_button.is_pressed(mouse_pos, mouse_pressed):
                     is_menu = False
@@ -716,6 +722,11 @@ def level_1(bg, screen):
     enemies = []
     gallery_features = []
 
+    if dict["is_yellow_key"] == 1:
+        heart = True
+    if dict["is_yellow_key"] == 0:
+        heart = False
+
     entities.add(hero)
     entities.add(typical_enemy_1, typical_enemy_2, typical_enemy_3, typical_enemy_4)
     enemies.append(typical_enemy_1)
@@ -808,11 +819,14 @@ def level_1(bg, screen):
                     running_1 = 2
                     switch_pause = True
 
-            if invisible_time == 0:
-                hero.collide_enemy(enemies, hero)
-                invisible_time = FPS // 6
+            hero.collide_enemy(enemies, hero)
+            if heart and hero.health == 0:
+                invisible_time = FPS // 1.5
+                hero.health = 100
+                heart = False
             elif invisible_time > 0:
                 invisible_time -= 1
+                hero.health = 100
 
             if hero.health > 0:
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
@@ -985,6 +999,10 @@ def level_2(bg, screen):
     switch = True
     part_1 = True
     part_2 = False
+    if dict["is_yellow_key"] == 1:
+        heart = True
+    if dict["is_yellow_key"] == 0:
+        heart = False
 
     run = True
     while run:
@@ -1120,11 +1138,14 @@ def level_2(bg, screen):
                     switch_pause = True
                     running_2 = 2
 
-            if invisible_time == 0:
-                hero.collide_enemy(enemies, hero)
-                invisible_time = FPS // 6
+            hero.collide_enemy(enemies, hero)
+            if heart and hero.health == 0:
+                invisible_time = FPS // 1.5
+                hero.health = 100
+                heart = False
             elif invisible_time > 0:
                 invisible_time -= 1
+                hero.health = 100
 
             if hero.health > 0:
 
@@ -1355,6 +1376,7 @@ def level_2(bg, screen):
                 for l in lavas:
                     if sprite.collide_rect(hero, l):
                         hero.health = 0
+                        invisible_time = 0
             elif hero.health <= 0:
                 is_game_over = True
                 run = False
@@ -1385,7 +1407,7 @@ def level_3(bg, screen):
     Number_of_level = 3
 
     date_time_obj1 = datetime.datetime.now()
-    invisible_time = FPS
+    invisible_time = 0
 
     pygame.mixer.music.set_volume(dict["music_volume"])
     pygame.mixer.music.load("Music/boss_music_1.mp3")
@@ -1406,18 +1428,25 @@ def level_3(bg, screen):
     enemies = []
     lavas = []
     gallery_features = []
-
+    bullets = []
+    if dict["is_yellow_key"] == 1:
+        heart = True
+    if dict["is_yellow_key"] == 0:
+        heart = False
+    boss = Enemy(WIN_WIDTH-PLATFORM_WIDTH*16, WIN_HEIGHT/2, enemy_image="boss_1")
     entities.add(hero)
+    entities.add(boss)
+    enemies.append(boss)
 
     level = [
         "                                                ",
         "                                                ",
         "                                                ",
-        "      -                                         ",
+        "      =                                         ",
         "                                                ",
         "            -                                   ",
-        "   <               -                            ",
-        "                                                ",
+        "                   -                            ",
+        "   <                                            ",
         "           =                                    ",
         "                      <                         ",
         "       =                                        ",
@@ -1500,15 +1529,54 @@ def level_3(bg, screen):
                     running_3 = 2
                     switch_pause = True
 
-            if invisible_time == 0:
-                hero.collide_enemy(enemies, hero)
-                invisible_time = FPS // 6
+            hero.collide_enemy(enemies, hero)
+            if heart and hero.health == 0:
+                invisible_time = FPS // 1.5
+                hero.health = 100
+                heart = False
             elif invisible_time > 0:
                 invisible_time -= 1
+                hero.health = 100
 
             if hero.health > 0:
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
+
+                date_time_obj2 = datetime.datetime.now()
+                time_delta = date_time_obj2 - date_time_obj1
+                seconds = time_delta.total_seconds()
+
+                centerX_hero, centerY_hero = hero.rect.center
+                centerX_boss, centerY_boss = boss.rect.center
+                bottomleftX, bottomleftY = boss.rect.bottomleft
+                bottomrightX, bottomrightY = boss.rect.bottomright
+
+                dy_1 = centerY_hero - centerY_boss
+                boss.update(move_counter=280, b=dy_1, d=boss.health/100, enemy_image="boss_1", bottomleftX=bottomleftX,
+                            bottomleftY=bottomleftY, bottomrightX=bottomrightX)
+
+                if ((seconds + 1) // 1) % 3 == 0 and len(bullets) == 0:
+                    bullet = Enemy(centerX_boss, centerY_boss, 20, "bomb_big_green")
+                    bullets.append(bullet)
+                    enemies.append(bullet)
+                    entities.add(bullet)
+
+                    centerX_hero, centerY_hero = hero.rect.center
+                    centerX_bullet, centerY_bullet = bullet.rect.center
+                    dx = centerX_hero - centerX_bullet
+                    dy = centerY_hero - centerY_bullet
+                    c = (dx ** 2 + dy ** 2) ** 0.5
+
+                if len(bullets) > 0:
+                    if bullet.rect.x < WIN_WIDTH or bullet.rect.x > 0 or bullet.rect.y < WIN_HEIGHT \
+                            or bullet.rect.y > 0:
+                        bullet.update(enemy_image="bomb_big_green", a=dx, b=dy, C=c)
+                    if bullet.rect.x >= WIN_WIDTH or bullet.rect.x <= 0 or bullet.rect.y >= WIN_HEIGHT \
+                            or bullet.rect.y <= 0:
+                        enemies.remove(bullet)
+                        entities.remove(bullet)
+                        bullets.remove(bullet)
+
                 entities.draw(screen)  # отображение
 
                 if hero.health == 100:
@@ -1579,6 +1647,7 @@ def level_3(bg, screen):
 
     return is_game_over, running_3, is_landay, is_menu, menu_music, Number_of_level, amount_passed_levels, \
            switch_pause, is_pass_level_screen, is_red_key
+
 
 
 def main():

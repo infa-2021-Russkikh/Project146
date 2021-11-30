@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
+# import pygame.mixer
 from pygame import *
 import ctypes
 import os
@@ -35,9 +36,13 @@ ANIMATION_JUMP_RIGHT = [('%s/FOPF/jr.png' % ICON_DIR, 0.1)]
 ANIMATION_JUMP = [('%s/FOPF/j.png' % ICON_DIR, 0.1)]
 ANIMATION_STAY = [('%s/FOPF/0.png' % ICON_DIR, 0.1)]
 
+# pygame.mixer.pre_init(44100, -16, 2, 512)
+# mixer.init()
+# jump_sound = pygame.mixer.Sound("Sounds/hero_jump.wav")
+
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y, HEALTH=100):
+    def __init__(self, x, y, HEALTH=100, invisible_time=0):
         sprite.Sprite.__init__(self)
         self.x_vel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
@@ -48,6 +53,7 @@ class Player(sprite.Sprite):
         self.y_vel = 0  # скорость вертикального перемещения
         self.onGround = False  # На земле ли я?
         self.health = HEALTH
+        self.invisible_time = invisible_time
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
         # Анимация движения вправо
         boltAnim = []
@@ -79,6 +85,7 @@ class Player(sprite.Sprite):
         if Up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.y_vel = -JUMP_POWER
+                # jump_sound.play()
             self.image.fill(Color(COLOR))
             self.boltAnimJump.blit(self.image, (0, 0))
         if left:

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import random
+
 import pygame.mixer
 
 import Level_1
-from Player import *
+# from Player import *
 from Enemy import *
 from textures import *
 from buttones import *
@@ -1429,10 +1431,13 @@ def level_3(bg, screen):
     lavas = []
     gallery_features = []
     bullets = []
+
     if dict["is_yellow_key"] == 1:
         heart = True
     if dict["is_yellow_key"] == 0:
         heart = False
+    hurt = False
+
     boss = Enemy(WIN_WIDTH-PLATFORM_WIDTH*16, WIN_HEIGHT/2, enemy_image="boss_1")
     entities.add(hero)
     entities.add(boss)
@@ -1498,36 +1503,6 @@ def level_3(bg, screen):
     while run:
         timer.tick(FPS)
         if running_3 == 1:
-            for event in pygame.event.get():  # Обрабатываем события
-                if event.type == QUIT:
-                    raise SystemExit("QUIT")
-                if event.type == KEYDOWN and event.key == K_UP:
-                    Up = True
-                if event.type == KEYDOWN and event.key == K_w:
-                    Up = True
-                if event.type == KEYUP and event.key == K_UP:
-                    Up = False
-                if event.type == KEYUP and event.key == K_w:
-                    Up = False
-                if event.type == KEYDOWN and event.key == K_LEFT:
-                    left = True
-                if event.type == KEYDOWN and event.key == K_a:
-                    left = True
-                if event.type == KEYDOWN and event.key == K_RIGHT:
-                    right = True
-                if event.type == KEYDOWN and event.key == K_d:
-                    right = True
-                if event.type == KEYUP and event.key == K_RIGHT:
-                    right = False
-                if event.type == KEYUP and event.key == K_d:
-                    right = False
-                if event.type == KEYUP and event.key == K_LEFT:
-                    left = False
-                if event.type == KEYUP and event.key == K_a:
-                    left = False
-                if event.type == KEYDOWN and event.key == K_ESCAPE:
-                    running_3 = 2
-                    switch_pause = True
 
             hero.collide_enemy(enemies, hero)
             if heart and hero.health == 0:
@@ -1539,6 +1514,39 @@ def level_3(bg, screen):
                 hero.health = 100
 
             if hero.health > 0:
+
+                if boss.health <= 0:
+                    bottomleftX, bottomleftY = boss.rect.bottomleft
+                    bottomrightX, bottomrightY = boss.rect.bottomright
+                    pygame.draw.rect(screen, RED, (bottomleftX, bottomleftY,
+                                                   (bottomrightX - bottomleftX), PLATFORM_HEIGHT / 4))
+                    your_time = time_delta_2
+                    timestr = f'{your_time}'
+                    ftr = [3600, 60, 1, 10 ** (-6)]
+                    your_time_seconds = sum([a * b for a, b in zip(ftr, map(float, timestr.split(':')))])
+                    try:
+                        if your_time_seconds < dict["your_time_seconds_2"]:
+                            dict["your_time_seconds_2"] = your_time_seconds
+                    except KeyError:
+                        dict["your_time_seconds_2"] = your_time_seconds
+
+                    dict["amount_passed_levels"] = 2
+                    dict["health"] = hero.health
+
+                    # if einstein:
+                    #     is_einstein = 1
+                    #     dict["is_einstein"] = 1
+                    with open("saves.json", 'w') as foo:
+                        json.dump(dict, foo)
+                    with open("saves.json", 'r') as foo:
+                        dict = json.load(foo)
+
+                    menu_music = False
+                    is_pass_level_screen = True
+                    while is_pass_level_screen:
+                        pass_level_screen(bg, screen, your_time, your_time_seconds)
+                    run = False
+
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
 
@@ -1555,8 +1563,12 @@ def level_3(bg, screen):
                 boss.update(move_counter=280, b=dy_1, d=boss.health/100, enemy_image="boss_1", bottomleftX=bottomleftX,
                             bottomleftY=bottomleftY, bottomrightX=bottomrightX)
 
-                if ((seconds + 1) // 1) % 3 == 0 and len(bullets) == 0:
-                    bullet = Enemy(centerX_boss, centerY_boss, 20, "bomb_big_green")
+                if ((seconds + 1) // 1) % 5 == 0 and len(bullets) == 0:
+                    r = random.random()
+                    if r > 0.85:
+                        bullet = Enemy(centerX_boss, centerY_boss, 20, "bomb_big_green", color="green")
+                    if r <= 0.85:
+                        bullet = Enemy(centerX_boss, centerY_boss, 20, "bomb_big_purple")
                     bullets.append(bullet)
                     enemies.append(bullet)
                     entities.add(bullet)
@@ -1576,6 +1588,81 @@ def level_3(bg, screen):
                         enemies.remove(bullet)
                         entities.remove(bullet)
                         bullets.remove(bullet)
+
+
+                for event in pygame.event.get():  # Обрабатываем события
+                    if event.type == QUIT:
+                        raise SystemExit("QUIT")
+                    if event.type == KEYDOWN and event.key == K_UP:
+                        Up = True
+                    if event.type == KEYDOWN and event.key == K_w:
+                        Up = True
+                    if event.type == KEYUP and event.key == K_UP:
+                        Up = False
+                    if event.type == KEYUP and event.key == K_w:
+                        Up = False
+                    if event.type == KEYDOWN and event.key == K_LEFT:
+                        left = True
+                    if event.type == KEYDOWN and event.key == K_a:
+                        left = True
+                    if event.type == KEYDOWN and event.key == K_RIGHT:
+                        right = True
+                    if event.type == KEYDOWN and event.key == K_d:
+                        right = True
+                    if event.type == KEYUP and event.key == K_RIGHT:
+                        right = False
+                    if event.type == KEYUP and event.key == K_d:
+                        right = False
+                    if event.type == KEYUP and event.key == K_LEFT:
+                        left = False
+                    if event.type == KEYUP and event.key == K_a:
+                        left = False
+                    if event.type == KEYDOWN and event.key == K_ESCAPE:
+                        running_3 = 2
+                        switch_pause = True
+                    if event.type == MOUSEBUTTONDOWN:
+                        try:
+                            if bullet.color == "green":
+                                centerX_hero, centerY_hero = hero.rect.center
+                                centerX_bullet, centerY_bullet = bullet.rect.center
+                                if 120 > centerX_bullet-centerX_hero > 0:
+                                    enemies.remove(bullet)
+                                    entities.remove(bullet)
+                                    bullets.remove(bullet)
+
+                                    bullet = Enemy(centerX_bullet, centerY_bullet, 20, "bomb_big_green")
+                                    bullets.append(bullet)
+                                    enemies.append(bullet)
+                                    entities.add(bullet)
+                                    hurt = True
+
+                                    centerX_hero, centerY_hero = hero.rect.center
+                                    centerX_bullet, centerY_bullet = bullet.rect.center
+                                    dx = centerX_boss - centerX_bullet
+                                    dy = centerY_boss - centerY_bullet
+                                    c = (dx ** 2 + dy ** 2) ** 0.5
+
+                                if len(bullets) > 0:
+                                    if bullet.rect.x < WIN_WIDTH or bullet.rect.x > 0 or bullet.rect.y < WIN_HEIGHT \
+                                            or bullet.rect.y > 0:
+                                        bullet.update(enemy_image="bomb_big_green", a=-dx, b=-dy, C=c)
+                                    if bullet.rect.x >= WIN_WIDTH or bullet.rect.x <= 0 or bullet.rect.y >= WIN_HEIGHT \
+                                            or bullet.rect.y <= 0:
+                                        enemies.remove(bullet)
+                                        entities.remove(bullet)
+                                        bullets.remove(bullet)
+                        except:
+                            pass
+                try:
+                    for b in bullets:
+                        if sprite.collide_rect(boss, b) and hurt:
+                            boss.health -= 1
+                            hurt = False
+                            enemies.remove(bullet)
+                            entities.remove(bullet)
+                            bullets.remove(bullet)
+                except:
+                    pass
 
                 entities.draw(screen)  # отображение
 
@@ -1604,32 +1691,6 @@ def level_3(bg, screen):
                     if sprite.collide_rect(hero, l):
                         hero.health = 0
 
-                for e in level_exits:
-                    if sprite.collide_rect(hero, e):
-                        amount_passed_levels = 1
-                        your_time = time_delta_2
-
-                        timestr = f'{your_time}'
-                        ftr = [3600, 60, 1, 10 ** (-6)]
-                        your_time_seconds = sum([a * b for a, b in zip(ftr, map(float, timestr.split(':')))])
-                        try:
-                            if your_time_seconds < dict["your_time_seconds_1"]:
-                                dict["your_time_seconds_1"] = your_time_seconds
-                        except KeyError:
-                            dict["your_time_seconds_1"] = your_time_seconds
-                        if dict["your_time_seconds_1"] <= 12.5:
-                            dict["is_red_key"] = 1
-
-                        dict["amount_passed_levels"] = 1
-                        dict["health"] = hero.health
-                        with open("saves.json", 'w') as foo:
-                            json.dump(dict, foo)
-
-                        menu_music = False
-                        is_pass_level_screen = True
-                        while is_pass_level_screen:
-                            pass_level_screen(bg, screen, your_time, your_time_seconds)
-                        run = False
             elif hero.health <= 0:
                 is_game_over = True
                 run = False

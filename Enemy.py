@@ -12,9 +12,10 @@ RED = (255, 0, 0)
 
 
 class Enemy(sprite.Sprite):
-    def __init__(self, x, y, move_direction=1, enemy_image="typical_enemy", health=100):
+    def __init__(self, x, y, move_direction=1, enemy_image="typical_enemy", health=100, color="purple"):
         sprite.Sprite.__init__(self)
         self.image = image.load(f'Textures/{enemy_image}.png')
+        self.color = color
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -30,7 +31,8 @@ class Enemy(sprite.Sprite):
             if abs(self.move_counter) > move_counter:
                 self.move_direction *= -1
                 self.move_counter *= -1
-        if enemy_image == "bomb" or enemy_image == "bomb_mini" or enemy_image == "bomb_big_green":
+        if enemy_image == "bomb" or enemy_image == "bomb_mini" or enemy_image == "bomb_big_green" \
+                or enemy_image == "bomb_big_purple":
             self.rect.x += self.move_direction * a / C
             self.rect.y += self.move_direction * b / C
         if enemy_image == "boss_1":
@@ -46,3 +48,4 @@ class Enemy(sprite.Sprite):
                 self.rect.y += b/abs(b) * abs(self.move_direction)
             if b == 0:
                 self.rect.y = self.rect.y
+

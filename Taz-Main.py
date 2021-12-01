@@ -1563,11 +1563,11 @@ def level_3(bg, screen):
                 boss.update(move_counter=280, b=dy_1, d=boss.health/100, enemy_image="boss_1", bottomleftX=bottomleftX,
                             bottomleftY=bottomleftY, bottomrightX=bottomrightX)
 
-                if ((seconds + 1) // 1) % 5 == 0 and len(bullets) == 0:
+                if ((seconds + 1) // 1) % 5 == 0 and len(bullets) == 0 and centerX_boss > PLATFORM_WIDTH*30:
                     r = random.random()
-                    if r > 0.85:
+                    if r > 0.8:
                         bullet = Enemy(centerX_boss, centerY_boss, 20, "bomb_big_green", color="green")
-                    if r <= 0.85:
+                    if r <= 0.8:
                         bullet = Enemy(centerX_boss, centerY_boss, 20, "bomb_big_purple")
                     bullets.append(bullet)
                     enemies.append(bullet)
@@ -1622,6 +1622,8 @@ def level_3(bg, screen):
                         switch_pause = True
                     if event.type == MOUSEBUTTONDOWN:
                         try:
+                            if centerX_boss - centerX_hero < 145:
+                                boss.health -= 2
                             if bullet.color == "green":
                                 centerX_hero, centerY_hero = hero.rect.center
                                 centerX_bullet, centerY_bullet = bullet.rect.center

@@ -39,7 +39,31 @@ gallery_pictures = []
 amount_passed_levels = dict["amount_passed_levels"]
 is_landay = dict["is_landay"]
 is_einstein = dict["is_einstein"]
+is_karasev = dict["is_karasev"]
 is_red_key = dict["is_red_key"]
+try:
+    if dict["your_time_seconds_1"] <= 12.5:
+        is_1 = 1
+    else:
+        is_1 = 0
+except KeyError:
+    is_1 = 0
+try:
+    if dict["your_time_seconds_2"] <= 60:
+        is_2 = 1
+    else:
+        is_2 = 0
+except KeyError:
+    is_2 = 0
+try:
+    if dict["your_time_seconds_1"] <= 300:
+        is_3 = 1
+    else:
+        is_3 = 0
+except KeyError:
+    is_3 = 0
+progress = (dict["is_einstein"] + dict["is_landay"] + dict["is_karasev"] + dict["is_red_key"] + dict["is_yellow_key"]
+            + dict["amount_passed_levels"] + is_1 + is_2 + is_3) * 100 // 11
 gallery_pictures.append(is_landay)
 is_menu = False
 is_options_menu = False
@@ -48,6 +72,7 @@ menu_music = False
 is_levels = False
 is_game_over = False
 is_pass_level_screen = False
+is_hiryanov_menu = False
 running_1 = 0
 running_2 = 0
 running_3_1 = 0
@@ -68,7 +93,7 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict, is_achievements_menu,\
+    global running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict, is_achievements_menu, \
         running_2, running_3_1
     if not menu_music:
         pygame.mixer.music.set_volume(dict["music_volume"])
@@ -81,29 +106,33 @@ def menu(bg, screen):
     with open("saves.json", 'r') as f:
         dict = json.load(f)
 
-    start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 2, WIN_WIDTH / 3.2,
+    start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 3, WIN_WIDTH / 3.2,
                           PLATFORM_HEIGHT * 2, 'Start/Continue')
     start_button.draw(screen)
 
-    levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 6, WIN_WIDTH / 3.2,
+    levels_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 7, WIN_WIDTH / 3.2,
                            PLATFORM_HEIGHT * 2, 'Levels')
     levels_button.draw(screen)
 
-    options_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 10, WIN_WIDTH / 3.2,
+    options_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 11, WIN_WIDTH / 3.2,
                             PLATFORM_HEIGHT * 2, 'Options')
     options_button.draw(screen)
 
-    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 14, WIN_WIDTH / 3.2,
+    gallery_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 15, WIN_WIDTH / 3.2,
                             PLATFORM_HEIGHT * 2, 'Gallery')
     gallery_button.draw(screen)
 
-    achievements_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 18,
+    achievements_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 19,
                                  WIN_WIDTH / 3.2, PLATFORM_HEIGHT * 2, 'Achievements')
     achievements_button.draw(screen)
 
-    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 22, WIN_WIDTH / 3.2,
+    quit_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 22.5, WIN_WIDTH / 3.2,
                          PLATFORM_HEIGHT * 2, 'Quit')
     quit_button.draw(screen)
+
+    progress_button = Button(RED, WIN_WIDTH / 2, PLATFORM_HEIGHT * 1, 0.00000001, 0.00000001,
+                             f'Progress: {progress} %')
+    progress_button.draw(screen)
 
     pygame.display.update()
     run = True
@@ -165,32 +194,32 @@ def level_menu(bg, screen):
     # screen.blit(bg, (0, 0))
     screen.fill(Color(GREEN))
 
-    level_1_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*4, WIN_WIDTH / 3.2,
+    level_1_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 4, WIN_WIDTH / 3.2,
                             WIN_HEIGHT / 15, 'Level 1')
     level_1_button.draw(screen)
 
     if amount_passed_levels < 1:
-        level_2_button = Button(GREY, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*8,
+        level_2_button = Button(GREY, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 8,
                                 WIN_WIDTH / 3.2,
                                 WIN_HEIGHT / 15, 'Level 2')
 
         cannot_button = Button(GREY, WIN_WIDTH / 2, WIN_HEIGHT / 2 - WIN_HEIGHT / 29, 0.1, 0.1,
                                'Firstly, pass all previous levels')
     else:
-        level_2_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*8,
+        level_2_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 8,
                                 WIN_WIDTH / 3.2,
                                 WIN_HEIGHT / 15, 'Level 2')
     level_2_button.draw(screen)
 
     if amount_passed_levels < 2:
-        level_3_button = Button(GREY, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*12,
+        level_3_button = Button(GREY, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 12,
                                 WIN_WIDTH / 3.2,
                                 WIN_HEIGHT / 15, 'Level 3')
 
         cannot_button = Button(GREY, WIN_WIDTH / 2, WIN_HEIGHT / 2 - WIN_HEIGHT / 29, 0.1, 0.1,
                                'Firstly, pass all previous levels')
     else:
-        level_3_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT*12,
+        level_3_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 12,
                                 WIN_WIDTH / 3.2,
                                 WIN_HEIGHT / 15, 'Level 3')
     level_3_button.draw(screen)
@@ -257,6 +286,15 @@ def gallery_menu(bg, screen):
     else:
         picture_2_image = pygame.image.load("Textures/gallery_einstein_picture.png")
         picture_2_image_rect = picture_2_image.get_rect(center=(500, 150))
+        screen.blit(picture_2_image, picture_2_image_rect)
+
+    if not is_karasev:
+        picture_2_image = pygame.image.load("Textures/invisible_person.png")
+        picture_2_image_rect = picture_2_image.get_rect(center=(800, 150))
+        screen.blit(picture_2_image, picture_2_image_rect)
+    else:
+        picture_2_image = pygame.image.load("Textures/karasev_gallery_feature.png")
+        picture_2_image_rect = picture_2_image.get_rect(center=(800, 150))
         screen.blit(picture_2_image, picture_2_image_rect)
 
     back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
@@ -352,6 +390,8 @@ def achievements_menu(bg, screen):
                           PLATFORM_HEIGHT, 'level 1')
     level_2_name = Button(GREEN, PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 3, PLATFORM_WIDTH,
                           PLATFORM_HEIGHT, 'level 2')
+    level_3_name = Button(GREEN, PLATFORM_WIDTH * 25, PLATFORM_HEIGHT * 3, PLATFORM_WIDTH,
+                          PLATFORM_HEIGHT, 'level 3')
 
     try:
         level_1_record = Button(GREEN, PLATFORM_WIDTH * 5, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
@@ -366,8 +406,16 @@ def achievements_menu(bg, screen):
         level_2_record = Button(GREEN, PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
                                 PLATFORM_HEIGHT, "Empty -_-")
 
+    try:
+        level_3_record = Button(GREEN, PLATFORM_WIDTH * 25, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+                                PLATFORM_HEIGHT, f'{dict["your_time_seconds_3"]}')
+    except KeyError:
+        level_3_record = Button(GREEN, PLATFORM_WIDTH * 25, PLATFORM_HEIGHT * 5, PLATFORM_WIDTH,
+                                PLATFORM_HEIGHT, "Empty -_-")
+
     level_1_name.draw(screen, Color=WHITE)
     level_2_name.draw(screen, Color=WHITE)
+    level_3_name.draw(screen, Color=WHITE)
     try:
         if dict["your_time_seconds_1"] <= 12.5:
             level_1_record.draw(screen, Color=WHITE)
@@ -382,6 +430,14 @@ def achievements_menu(bg, screen):
             level_2_record.draw(screen, Color=RED)
     except KeyError:
         level_2_record.draw(screen, Color=WHITE)
+
+    try:
+        if dict["your_time_seconds_2"] <= 300:
+            level_3_record.draw(screen, Color=WHITE)
+        else:
+            level_3_record.draw(screen, Color=RED)
+    except KeyError:
+        level_3_record.draw(screen, Color=WHITE)
 
     if dict["is_red_key"] == 0:
         picture_1_image = pygame.image.load("Textures/hud_keyRed_disabled.png")
@@ -596,7 +652,7 @@ def restart():
 
 def pass_level_screen(bg, screen, your_time, your_time_seconds):
     global running_1, is_menu, Number_of_level, running_2, menu_music, switch_pause, dt, \
-        date_time_obj4, is_pass_level_screen, is_restart
+        date_time_obj4, is_pass_level_screen, is_restart, running_3_1, running_3_2, is_hiryanov_menu
 
     pause_bg = pygame.image.load("Textures/maybe_pause_bg.png")
     screen.blit(pause_bg, (PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 1))
@@ -632,6 +688,20 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
                                       0.000001, f'{your_time}')
             what_time_button.draw(screen, size=48, Color=GREEN)
 
+    if Number_of_level == 32:
+        on_record_time_button = Button(RED, PLATFORM_WIDTH * 30.5, PLATFORM_HEIGHT * 13, 0.000001,
+                                       0.000001, 'of 0:00:05:00')
+        on_record_time_button.draw(screen, size=48, Color=WHITE)
+
+        if your_time_seconds > 300:
+            what_time_button = Button(RED, PLATFORM_WIDTH * 20.5, PLATFORM_HEIGHT * 13, 0.000001,
+                                      0.000001, f'{your_time}')
+            what_time_button.draw(screen, size=48, Color=RED)
+        if your_time_seconds <= 300:
+            what_time_button = Button(RED, PLATFORM_WIDTH * 20.5, PLATFORM_HEIGHT * 13, 0.000001,
+                                      0.000001, f'{your_time}')
+            what_time_button.draw(screen, size=48, Color=GREEN)
+
     restart_button = Button(RED, PLATFORM_WIDTH * 21, PLATFORM_HEIGHT * 8, PLATFORM_WIDTH * 6,
                             PLATFORM_HEIGHT * 2, 'Restart')
     restart_button.draw(screen, size=48)
@@ -658,10 +728,14 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
                         running_1 = 0
                         is_pass_level_screen = False
                         running_2 = 1
-                    # elif Number_of_level == 2:
-                    #     running_2 = 0
-                    #     is_pass_level_screen = False
-                    # running_3 = 1
+                    elif Number_of_level == 2:
+                        running_2 = 0
+                        is_pass_level_screen = False
+                        running_3_1 = 1
+                    elif Number_of_level == 32:
+                        running_3_2 = 0
+                        is_hiryanov_menu = True
+                        is_pass_level_screen = False
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
                     dt = datetime.datetime.now() - datetime.datetime.now()
@@ -684,6 +758,47 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
         pygame.display.update()
     pygame.mixer.music.unpause()
     return running_1, is_menu, switch_pause, dt, is_pass_level_screen, running_2
+
+
+def hiryanov_menu(bg, screen):
+    global is_hiryanov_menu, is_menu, menu_music, dt, progress
+
+    pause_bg = pygame.image.load("Textures/hiryanov.png")
+    screen.blit(pause_bg, (PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 1))
+
+    if progress == 100:
+        next_level_button = Button(RED, PLATFORM_WIDTH * 20, WIN_HEIGHT / 6 - WIN_HEIGHT / 27,
+                                   PLATFORM_WIDTH * 8,
+                                   WIN_HEIGHT / 15, "You not complete all my problems. Back to beginning and do all!")
+        next_level_button.draw(screen, size=48)
+    if progress < 100:
+        next_level_button = Button(RED, PLATFORM_WIDTH * 20, WIN_HEIGHT / 6 - WIN_HEIGHT / 27,
+                                   PLATFORM_WIDTH * 8,
+                                   WIN_HEIGHT / 15, "You complete all my problems. Unfortunately, I love recursion!!")
+        next_level_button.draw(screen, size=48)
+
+    menu_button = Button(RED, WIN_WIDTH / 2 - PLATFORM_WIDTH * 2, WIN_HEIGHT / 2 + PLATFORM_HEIGHT * 2,
+                         PLATFORM_WIDTH * 4,
+                         WIN_HEIGHT / 15, 'Menu')
+    menu_button.draw(screen, size=48)
+
+    pygame.display.update()
+
+    run = True
+    while run:
+        timer.tick(FPS)
+        for even in pygame.event.get():  # Обрабатываем события
+            if even.type == QUIT:
+                raise SystemExit("QUIT")
+            if even.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                if menu_button.is_pressed(mouse_pos, mouse_pressed):
+                    dt = datetime.datetime.now() - datetime.datetime.now()
+                    is_menu = True
+                    is_hiryanov_menu = False
+                    menu_music = False
+                    run = False
 
 
 def level_1(bg, screen):
@@ -1422,12 +1537,12 @@ def level_3_1(bg, screen):
     pygame.mixer.music.play(-1)
 
     if dict["is_yellow_key"] == 0:
-        hero = Player(PLATFORM_WIDTH*3, WIN_HEIGHT - PLATFORM_HEIGHT*4)  # создаем героя по (x,y) координатам
+        hero = Player(PLATFORM_WIDTH * 3, WIN_HEIGHT - PLATFORM_HEIGHT * 4)  # создаем героя по (x,y) координатам
     elif dict["is_yellow_key"] == 1:
         if dict["health"] == 200:
-            hero = Player(PLATFORM_WIDTH*3, WIN_HEIGHT - PLATFORM_HEIGHT*4, HEALTH=200)
+            hero = Player(PLATFORM_WIDTH * 3, WIN_HEIGHT - PLATFORM_HEIGHT * 4, HEALTH=200)
         if dict["health"] == 100:
-            hero = Player(PLATFORM_WIDTH*3, WIN_HEIGHT - PLATFORM_HEIGHT*4)
+            hero = Player(PLATFORM_WIDTH * 3, WIN_HEIGHT - PLATFORM_HEIGHT * 4)
     left = right = False  # по умолчанию — стоим
     Up = False
     entities = pygame.sprite.Group()  # Все объекты
@@ -1452,7 +1567,7 @@ def level_3_1(bg, screen):
     archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT, enemy_image="enemy_2_straight")
     archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT, enemy_image="enemy_2_straight")
 
-    boss = Enemy(WIN_WIDTH-PLATFORM_WIDTH*16, WIN_HEIGHT/2, enemy_image="boss_1")
+    boss = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 16, WIN_HEIGHT / 2, enemy_image="boss_1")
     entities.add(hero)
     entities.add(boss, archer_enemy_1, archer_enemy_2, archer_enemy_3)
     enemies.append(boss)
@@ -1462,7 +1577,6 @@ def level_3_1(bg, screen):
     archer_enemies.append(archer_enemy_1)
     archer_enemies.append(archer_enemy_2)
     archer_enemies.append(archer_enemy_3)
-    boss.health = 50
 
     level = [
         "                                                ",
@@ -1500,11 +1614,11 @@ def level_3_1(bg, screen):
                 entities.add(pf)
                 platforms.append(pf)
             if col == "=":
-                pfo = Platform(x, y+PLATFORM_HEIGHT/2)
+                pfo = Platform(x, y + PLATFORM_HEIGHT / 2)
                 entities.add(pfo)
                 platforms.append(pfo)
             if col == "<":
-                pfol = Platform(x-PLATFORM_WIDTH/2, y)
+                pfol = Platform(x - PLATFORM_WIDTH / 2, y)
                 entities.add(pfol)
                 platforms.append(pfol)
             if col == "*":
@@ -1739,7 +1853,7 @@ def level_3_1(bg, screen):
                             if bullet.color == "green":
                                 centerX_hero, centerY_hero = hero.rect.center
                                 centerX_bullet, centerY_bullet = bullet.rect.center
-                                if 120 > centerX_bullet-centerX_hero > 0:
+                                if 120 > centerX_bullet - centerX_hero > 0:
                                     enemies.remove(bullet)
                                     entities.remove(bullet)
                                     bullets.remove(bullet)
@@ -1831,8 +1945,8 @@ def level_3_2(bg, screen, hh, you_time):
         :param screen:
         :return:
         """
-    global is_game_over, running_3_1, running_3_2, is_menu, is_landay, menu_music, Number_of_level,\
-        amount_passed_levels, dict, switch_pause, date_time_obj4, is_pass_level_screen
+    global is_game_over, running_3_1, running_3_2, is_menu, is_landay, menu_music, Number_of_level, \
+        amount_passed_levels, dict, switch_pause, date_time_obj4, is_pass_level_screen, is_hiryanov_menu
     Number_of_level = 32
 
     invisible_time = 0
@@ -1857,6 +1971,7 @@ def level_3_2(bg, screen, hh, you_time):
     bullets_2 = []
     bullets_3 = []
     horizontal_bullets = []
+    archer_enemies = []
 
     if dict["is_yellow_key"] == 1:
         heart = True
@@ -1864,10 +1979,13 @@ def level_3_2(bg, screen, hh, you_time):
         heart = False
     hurt = False
 
+    archer_enemy_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT, enemy_image="enemy_2_straight")
+    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT, enemy_image="enemy_2_straight")
+    archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT, enemy_image="enemy_2_straight")
     typical_enemy_1 = Enemy(WIN_WIDTH / 7, PLATFORM_HEIGHT * 10)
     typical_enemy_2 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 7.5, PLATFORM_HEIGHT * 5)
     typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, PLATFORM_HEIGHT * 7, 2)
-    boss_right = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 5, WIN_HEIGHT / 2, enemy_image="boss_1_right")
+    boss_right = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 6.5, WIN_HEIGHT / 2, enemy_image="boss_1_right")
     boss_left = Enemy(PLATFORM_WIDTH * 5, WIN_HEIGHT / 2, enemy_image="boss_1_left")
     entities.add(hero)
     entities.add(boss_right, boss_left, typical_enemy_1, typical_enemy_2, typical_enemy_3)
@@ -1875,6 +1993,12 @@ def level_3_2(bg, screen, hh, you_time):
     enemies.append(typical_enemy_1)
     enemies.append(typical_enemy_2)
     enemies.append(typical_enemy_3)
+    enemies.append(archer_enemy_1)
+    enemies.append(archer_enemy_2)
+    enemies.append(archer_enemy_3)
+    archer_enemies.append(archer_enemy_1)
+    archer_enemies.append(archer_enemy_2)
+    archer_enemies.append(archer_enemy_3)
     enemies.append(boss_left)
 
     level = [
@@ -1884,16 +2008,16 @@ def level_3_2(bg, screen, hh, you_time):
         "          ================  ==========          ",
         "                                                ",
         "                                                ",
-        "                                                ",
-        "          ---------  -----------------          ",
-        "                                                ",
-        "                                                ",
-        "          ===============  ===========          ",
+        "                            =                   ",
         "                                                ",
         "                                                ",
         "                                                ",
         "          ---------  -----------------          ",
         "                                                ",
+        "                                                ",
+        "                      -                          ",
+        "                                                ",
+        "                -                                ",
         "                                                ",
         "          ================  ==========          ",
         "                                                ",
@@ -1969,9 +2093,9 @@ def level_3_2(bg, screen, hh, you_time):
                 dy_1 = centerY_hero - centerY_boss_right
                 dy_2 = centerY_hero - centerY_boss_left
                 boss_left.update(b=dy_1, d=boss_left.health / 100, enemy_image="boss_1_left",
-                            bottomleftX=left_bottomleftX,
-                            bottomleftY=left_bottomleftY, bottomrightX=left_bottomrightX)
-                boss_right.update(b=dy_2, d=boss_left.health / 100, enemy_image="boss_1_right",
+                                 bottomleftX=left_bottomleftX,
+                                 bottomleftY=left_bottomleftY, bottomrightX=left_bottomrightX)
+                boss_right.update(move_counter=105, b=dy_2, d=boss_left.health / 100, enemy_image="boss_1_right",
                                   bottomleftX=right_bottomleftX,
                                   bottomleftY=right_bottomleftY, bottomrightX=right_bottomrightX)
                 typical_enemy_1.update()
@@ -1983,7 +2107,7 @@ def level_3_2(bg, screen, hh, you_time):
                     horizontal_bullets.append(horizontal_bullet)
                     enemies.append(horizontal_bullet)
                     entities.add(horizontal_bullet)
-                    cooldown = FPS*1.5
+                    cooldown = FPS * 1.5
                 if len(horizontal_bullets) > 0:
                     cooldown -= 1
                     if cooldown == 0:
@@ -2017,6 +2141,91 @@ def level_3_2(bg, screen, hh, you_time):
                         entities.remove(bullet)
                         bullets.remove(bullet)
 
+                if boss_left.health == 0 or boss_right.health == 0:
+                    for arc in archer_enemies:
+                        arc.update(enemy_image="enemy_2_straight")
+                        for p in platforms:
+                            if sprite.collide_rect(arc, p):
+                                arc.onGround = True
+                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
+                        bullet_1 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 5, 10, "bomb_erase")
+                        bullets_1.append(bullet_1)
+                        enemies.append(bullet_1)
+                        entities.add(bullet_1)
+
+                        centerX_hero, centerY_hero = hero.rect.center
+                        centerX_bullet_1, centerY_bullet_1 = bullet_1.rect.center
+                        dx_1 = centerX_hero - centerX_bullet_1
+                        dy_1 = centerY_hero - centerY_bullet_1
+                        c_1 = (dx_1 ** 2 + dy_1 ** 2) ** 0.5
+
+                    if len(bullets_1) > 0:
+                        if c_1 > 500 and len(bullets_1) != 0:
+                            enemies.remove(bullet_1)
+                            entities.remove(bullet_1)
+                            bullets_1.remove(bullet_1)
+                        if bullet_1.rect.x < WIN_WIDTH or bullet_1.rect.x > 0 or bullet_1.rect.y < WIN_HEIGHT \
+                                or bullet_1.rect.y > 0:
+                            bullet_1.update(enemy_image="bomb", a=dx_1, b=dy_1, C=c_1)
+                        if bullet_1.rect.x >= WIN_WIDTH or bullet_1.rect.x <= 0 or bullet_1.rect.y >= WIN_HEIGHT \
+                                or bullet_1.rect.y <= 0:
+                            enemies.remove(bullet_1)
+                            entities.remove(bullet_1)
+                            bullets_1.remove(bullet_1)
+
+                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
+                        bullet_2 = Enemy(PLATFORM_WIDTH * 9, PLATFORM_HEIGHT * 7, 10, "bomb_erase")
+                        bullets_2.append(bullet_2)
+                        enemies.append(bullet_2)
+                        entities.add(bullet_2)
+
+                        centerX_hero, centerY_hero = hero.rect.center
+                        centerX_bullet_2, centerY_bullet_2 = bullet_2.rect.center
+
+                        dx_2 = centerX_hero - centerX_bullet_2
+                        dy_2 = centerY_hero - centerY_bullet_2
+                        c_2 = (dx_2 ** 2 + dy_2 ** 2) ** 0.5
+
+                    if len(bullets_2) > 0:
+                        if c_2 > 500 and len(bullets_2) != 0:
+                            enemies.remove(bullet_2)
+                            entities.remove(bullet_2)
+                            bullets_2.remove(bullet_2)
+                        if bullet_2.rect.x < WIN_WIDTH or bullet_2.rect.x > 0 or bullet_2.rect.y < WIN_HEIGHT \
+                                or bullet_2.rect.y > 0:
+                            bullet_2.update(enemy_image="bomb", a=dx_2, b=dy_2, C=c_2)
+                        if bullet_2.rect.x >= WIN_WIDTH or bullet_2.rect.x <= 0 or bullet_2.rect.y >= WIN_HEIGHT \
+                                or bullet_2.rect.y <= 0:
+                            enemies.remove(bullet_2)
+                            entities.remove(bullet_2)
+                            bullets_2.remove(bullet_2)
+
+                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_3) == 0:
+                        bullet_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 7, 5, "bomb_mini")
+                        bullets_3.append(bullet_3)
+                        enemies.append(bullet_3)
+                        entities.add(bullet_3)
+
+                        centerX_hero, centerY_hero = hero.rect.center
+                        centerX_bullet_3, centerY_bullet_3 = bullet_3.rect.center
+                        dx_3 = centerX_hero - centerX_bullet_3
+                        dy_3 = centerY_hero - centerY_bullet_3
+                        c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
+
+                    if len(bullets_3) > 0:
+                        if c_3 > PLATFORM_HEIGHT * 4 and len(bullets_3) != 0:
+                            enemies.remove(bullet_3)
+                            entities.remove(bullet_3)
+                            bullets_3.remove(bullet_3)
+                        if bullet_3.rect.x < WIN_WIDTH or bullet_3.rect.x > 0 or bullet_3.rect.y < WIN_HEIGHT \
+                                or bullet_3.rect.y > 0:
+                            bullet_3.update(enemy_image="bomb_mini", a=dx_3, b=dy_3, C=c_3)
+                        if bullet_3.rect.x >= WIN_WIDTH or bullet_3.rect.x <= 0 or bullet_3.rect.y >= WIN_HEIGHT \
+                                or bullet_3.rect.y <= 0:
+                            enemies.remove(bullet_3)
+                            entities.remove(bullet_3)
+                            bullets_3.remove(bullet_3)
+
                 for event in pygame.event.get():  # Обрабатываем события
                     if event.type == QUIT:
                         raise SystemExit("QUIT")
@@ -2049,8 +2258,10 @@ def level_3_2(bg, screen, hh, you_time):
                         switch_pause = True
                     if event.type == MOUSEBUTTONDOWN:
                         try:
-                            if centerX_boss_right - centerX_hero < 145:
-                                boss_right.health -= 2
+                            if centerX_boss_right - centerX_hero < 80:
+                                boss_right.health -= 4
+                            if centerX_boss_left - centerX_hero < 80:
+                                boss_left.health -= 4
                             if bullet.color == "green":
                                 centerX_hero, centerY_hero = hero.rect.center
                                 centerX_bullet, centerY_bullet = bullet.rect.center
@@ -2085,7 +2296,7 @@ def level_3_2(bg, screen, hh, you_time):
                 try:
                     for b in bullets:
                         if sprite.collide_rect(boss_right, b) and hurt:
-                            boss_right.health -= 1
+                            boss_right.health -= 10
                             hurt = False
                             enemies.remove(bullet)
                             entities.remove(bullet)
@@ -2093,6 +2304,35 @@ def level_3_2(bg, screen, hh, you_time):
                 except:
                     pass
 
+                if boss_right.health < 0:
+                    boss_right.health = 0
+                if boss_left.health < 0:
+                    boss_left.health = 0
+
+                if boss_right.health <= 0 and boss_left.health <= 0:
+                    your_time = time_delta_3
+                    timestr = f'{your_time}'
+                    ftr = [3600, 60, 1, 10 ** (-6)]
+                    your_time_seconds = sum([a * b for a, b in zip(ftr, map(float, timestr.split(':')))])
+                    try:
+                        if your_time_seconds < dict["your_time_seconds_2"]:
+                            dict["your_time_seconds_2"] = your_time_seconds
+                    except KeyError:
+                        dict["your_time_seconds_2"] = your_time_seconds
+
+                    dict["amount_passed_levels"] = 3
+                    dict["health"] = hero.health
+                    dict["is_karasev"] = 1
+                    with open("saves.json", 'w') as foo:
+                        json.dump(dict, foo)
+                    with open("saves.json", 'r') as foo:
+                        dict = json.load(foo)
+
+                    menu_music = False
+                    is_pass_level_screen = True
+                    while is_pass_level_screen:
+                        pass_level_screen(bg, screen, your_time, your_time_seconds)
+                    run = False
                 entities.draw(screen)  # отображение
 
                 pygame.display.update()
@@ -2112,7 +2352,7 @@ def level_3_2(bg, screen, hh, you_time):
         elif running_3_2 == 0:
             run = False
 
-    return is_game_over, running_3_1, running_3_1, is_landay, is_menu, menu_music, Number_of_level,\
+    return is_game_over, running_3_1, running_3_1, is_landay, is_menu, menu_music, Number_of_level, \
            amount_passed_levels, switch_pause, is_pass_level_screen, is_red_key
 
 
@@ -2123,9 +2363,10 @@ def main():
     screen = pygame.display.set_mode(DISPLAY)
     # screen = pygame.display.set_mode(DISPLAY, pygame.DOUBLEBUF | pygame.OpenGL)  # Создаем окошко
     pygame.display.set_caption("SUPER FOPF BOY")  # Пишем в шапку
+    # pygame.display.set_icon(pygame.image.load("icon.png"))
     bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности, будем использовать как фон
     # glClearColor(BACKGROUND_COLOR/255, 1)
-
+    # bg = pygame.image.load("Textures/Background.png")
     menu(bg, screen)
     runnin = True
     while runnin:

@@ -25,7 +25,8 @@ class Enemy(sprite.Sprite):
         self.onGround = False
 
     def update(self, move_counter=50, enemy_image="typical_enemy", a=1, b=0, C=1, d=100,
-               screen=pygame.display.set_mode(DISPLAY), bottomleftX=0, bottomleftY=0, bottomrightX=0):
+               screen=pygame.display.set_mode(DISPLAY), bottomleftX=0, bottomleftY=0, bottomrightX=0, topleftX=0,
+               topleftY=0, s=2):
         if enemy_image == "typical_enemy":
             self.rect.x += self.move_direction
             self.move_counter += 1
@@ -49,10 +50,18 @@ class Enemy(sprite.Sprite):
                 self.rect.y += b/abs(b) * abs(self.move_direction)
             if b == 0:
                 self.rect.y = self.rect.y
+            # if enemy_image == "boss_1_left":
+            #     if 1.5 < s <= 2:
+            #         self.rect = pygame.draw.rect(screen, WHITE, (bottomleftX, topleftY, 102,  bottomleftY - topleftY))
+            #     elif 1 < s <= 1.5:
+            #         self.rect = self.image.get_rect()
+            #     if 0.5 < s <= 1:
+            #         self.rect = pygame.draw.rect(screen, WHITE, (bottomleftX, bottomleftY - 204, 204, 204))
+            #     elif 0 < s <= 0.5:
+            #         self.rect = self.image.get_rect()
+
         if enemy_image == "enemy_2_straight":
             if not self.onGround:
                 self.rect.y += JUMP_POWER / 3
             else:
                 pass
-
-

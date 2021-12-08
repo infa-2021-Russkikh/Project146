@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import random
-
 import pygame.mixer
-
 import Level_2
 # from Player import *
 from Enemy import *
@@ -575,7 +573,7 @@ def game_over(bg, screen):
     :param screen:
     :return:
     """
-    global is_menu, running_1, is_game_over, running_2, Number_of_level, dict, menu_music, dt, running_3_1, running_3_2
+    global is_menu, running_1, is_game_over, running_2, Number_of_level, dict, menu_music, dt, running_3_1, is_restart
 
     dt = datetime.datetime.now() - datetime.datetime.now()
 
@@ -620,14 +618,16 @@ def game_over(bg, screen):
                 mouse_pos = pygame.mouse.get_pos()
                 mouse_pressed = pygame.mouse.get_pressed()
                 if restart_button.is_pressed(mouse_pos, mouse_pressed):
+                    dt = datetime.datetime.now() - datetime.datetime.now()
+                    is_restart = True
                     is_menu = False
-                    if Number_of_level == 1:
-                        running_1 = 1
-                    elif Number_of_level == 2:
-                        running_2 = 1
-                    elif Number_of_level == 31 or Number_of_level == 32:
-                        running_3_2 = 0
-                        running_3_1 = 1
+                    # if Number_of_level == 1:
+                    #     running_1 = 1
+                    # elif Number_of_level == 2:
+                    #     running_2 = 1
+                    # elif Number_of_level == 31 or Number_of_level == 32:
+                    #     running_3_2 = 0
+                    #     running_3_1 = 1
                     is_game_over = False
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
@@ -636,7 +636,7 @@ def game_over(bg, screen):
                     is_game_over = False
                     run = False
     pygame.display.update()
-    return is_menu, running_1, is_game_over, menu_music, running_2
+    return is_menu, running_1, is_game_over, menu_music, running_2, running_3_1, running_3_2
 
 
 def restart():
@@ -1070,7 +1070,6 @@ def level_2(bg, screen):
     archer_enemy_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 17, PLATFORM_HEIGHT * 11, enemy_image="enemy_2")
     archer_enemy_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 15, PLATFORM_HEIGHT * 9, enemy_image="enemy_2_90")
 
-    # hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
     if dict["is_yellow_key"] == 0:
         hero = Player(PLATFORM_WIDTH, WIN_HEIGHT - PLATFORM_HEIGHT * 7)  # создаем героя по (x,y) координатам
     elif dict["is_yellow_key"] == 1:
@@ -1122,7 +1121,6 @@ def level_2(bg, screen):
 
     switch = True
     part_1 = True
-    part_2 = False
     if dict["is_yellow_key"] == 1:
         heart = True
     if dict["is_yellow_key"] == 0:
@@ -1525,9 +1523,9 @@ def level_3_1(bg, screen):
         heart = False
     hurt = False
 
-    archer_enemy_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT*3, enemy_image="enemy_2_straight")
-    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT*3, enemy_image="enemy_2_straight")
-    archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT*3, enemy_image="enemy_2_straight")
+    archer_enemy_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
+    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
+    archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
 
     boss = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 16, WIN_HEIGHT / 2, enemy_image="boss_1")
     entities.add(hero)
@@ -1889,6 +1887,7 @@ def level_3_1(bg, screen):
                         hero.health = 0
 
             elif hero.health <= 0:
+                Number_of_level = 31
                 is_game_over = True
                 run = False
                 running_3_1 = 0
@@ -1948,9 +1947,9 @@ def level_3_2(bg, screen, hh, you_time):
         heart = False
     hurt = False
 
-    archer_enemy_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT*3, enemy_image="enemy_2_straight")
-    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT*3, enemy_image="enemy_2_straight")
-    archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT*3, enemy_image="enemy_2_straight")
+    archer_enemy_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
+    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
+    archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
     typical_enemy_1 = Enemy(WIN_WIDTH / 7, PLATFORM_HEIGHT * 10)
     typical_enemy_2 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 7.5, PLATFORM_HEIGHT * 5)
     typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, PLATFORM_HEIGHT * 7, 2)
@@ -2119,7 +2118,7 @@ def level_3_2(bg, screen, hh, you_time):
                             if sprite.collide_rect(arc, p):
                                 arc.onGround = True
                     if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
-                        bullet_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT*3, 10, "bomb_erase")
+                        bullet_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT * 3, 10, "bomb_erase")
                         bullets_1.append(bullet_1)
                         enemies.append(bullet_1)
                         entities.add(bullet_1)
@@ -2145,7 +2144,7 @@ def level_3_2(bg, screen, hh, you_time):
                             bullets_1.remove(bullet_1)
 
                     if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
-                        bullet_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT*3, 10, "bomb_erase")
+                        bullet_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT * 3, 10, "bomb_erase")
                         bullets_2.append(bullet_2)
                         enemies.append(bullet_2)
                         entities.add(bullet_2)
@@ -2172,7 +2171,7 @@ def level_3_2(bg, screen, hh, you_time):
                             bullets_2.remove(bullet_2)
 
                     if ((seconds + 1) // 1) % 3 == 0 and len(bullets_3) == 0:
-                        bullet_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT*3, 5, "bomb_erase")
+                        bullet_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT * 3, 5, "bomb_erase")
                         bullets_3.append(bullet_3)
                         enemies.append(bullet_3)
                         entities.add(bullet_3)
@@ -2309,6 +2308,7 @@ def level_3_2(bg, screen, hh, you_time):
                 pygame.display.update()
 
             elif hero.health <= 0:
+                Number_of_level = 31
                 is_game_over = True
                 run = False
                 running_3_2 = 0

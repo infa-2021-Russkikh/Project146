@@ -1062,7 +1062,7 @@ def level_2(bg, screen):
     typical_enemy_3 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 13, PLATFORM_HEIGHT * 3)
     typical_enemy_4 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 18, PLATFORM_HEIGHT * 3, 2)
     typical_enemy_5 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 22, PLATFORM_HEIGHT * 3)
-    typical_enemy_6 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 27, PLATFORM_HEIGHT * 3, 4)
+    typical_enemy_6 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 26.5, PLATFORM_HEIGHT * 3, 4)
     typical_enemy_7 = Enemy(PLATFORM_WIDTH * 30.5, PLATFORM_HEIGHT * 22)
     archer_enemy_1 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 5, enemy_image="enemy_2")
     archer_enemy_2 = Enemy(PLATFORM_WIDTH * 9, PLATFORM_HEIGHT * 7, enemy_image="enemy_2")
@@ -1239,7 +1239,7 @@ def level_2(bg, screen):
                 typical_enemy_3.update(move_counter=16)
                 typical_enemy_4.update(move_counter=16)
                 typical_enemy_5.update(move_counter=18)
-                typical_enemy_6.update(move_counter=12)
+                typical_enemy_6.update(move_counter=10)
                 typical_enemy_7.update(move_counter=20)
 
                 date_time_obj2 = datetime.datetime.now()
@@ -1660,35 +1660,35 @@ def level_3_1(bg, screen):
                         for p in platforms:
                             if sprite.collide_rect(arc, p):
                                 arc.onGround = True
-                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
-                        centerX_archer_1, centerY_archer_1 = archer_enemy_1.rect.center
-                        bullet_1 = Enemy(centerX_archer_1, centerY_archer_1, 5, "bomb_mini")
-                        bullets_1.append(bullet_1)
-                        enemies.append(bullet_1)
-                        entities.add(bullet_1)
-
-                        centerX_hero, centerY_hero = hero.rect.center
-                        centerX_bullet_1, centerY_bullet_1 = bullet_1.rect.center
-
-                        dx_1 = centerX_hero - centerX_bullet_1
-                        dy_1 = centerY_hero - centerY_bullet_1
-                        c_1 = (dx_1 ** 2 + dy_1 ** 2) ** 0.5
-
-                    if len(bullets_1) > 0:
-                        if c_1 > 500 and len(bullets_1) != 0:
-                            enemies.remove(bullet_1)
-                            entities.remove(bullet_1)
-                            bullets_1.remove(bullet_1)
-                        if bullet_1.rect.x < WIN_WIDTH or bullet_1.rect.x > 0 or bullet_1.rect.y < WIN_HEIGHT \
-                                or bullet_1.rect.y > 0:
-                            if len(bullets_1) != 0:
-                                bullet_1.update(enemy_image="bomb", a=dx_1, b=dy_1, C=c_1)
-                        if bullet_1.rect.x >= WIN_WIDTH or bullet_1.rect.x <= 0 or bullet_1.rect.y >= WIN_HEIGHT \
-                                or bullet_1.rect.y <= 0:
-                            if len(bullets_1) != 0:
-                                enemies.remove(bullet_1)
-                                entities.remove(bullet_1)
-                                bullets_1.remove(bullet_1)
+                    # if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
+                    #     centerX_archer_1, centerY_archer_1 = archer_enemy_1.rect.center
+                    #     bullet_1 = Enemy(centerX_archer_1, centerY_archer_1, 5, "bomb_mini")
+                    #     bullets_1.append(bullet_1)
+                    #     enemies.append(bullet_1)
+                    #     entities.add(bullet_1)
+                    #
+                    #     centerX_hero, centerY_hero = hero.rect.center
+                    #     centerX_bullet_1, centerY_bullet_1 = bullet_1.rect.center
+                    #
+                    #     dx_1 = centerX_hero - centerX_archer_1
+                    #     dy_1 = centerY_hero - centerY_archer_1
+                    #     c_1 = (dx_1 ** 2 + dy_1 ** 2) ** 0.5
+                    #
+                    # if len(bullets_1) > 0:
+                    #     if c_1 > 400 and len(bullets_1) != 0:
+                    #         enemies.remove(bullet_1)
+                    #         entities.remove(bullet_1)
+                    #         bullets_1.remove(bullet_1)
+                    #     if bullet_1.rect.x < WIN_WIDTH or bullet_1.rect.x > 0 or bullet_1.rect.y < WIN_HEIGHT \
+                    #             or bullet_1.rect.y > 0:
+                    #         if len(bullets_1) != 0:
+                    #             bullet_1.update(enemy_image="bomb", a=dx_1, b=dy_1, C=c_1)
+                    #     if bullet_1.rect.x >= WIN_WIDTH or bullet_1.rect.x <= 0 or bullet_1.rect.y >= WIN_HEIGHT \
+                    #             or bullet_1.rect.y <= 0:
+                    #         if len(bullets_1) != 0:
+                    #             enemies.remove(bullet_1)
+                    #             entities.remove(bullet_1)
+                    #             bullets_1.remove(bullet_1)
 
                     if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
                         centerX_archer_2, centerY_archer_2 = archer_enemy_2.rect.center
@@ -1700,12 +1700,12 @@ def level_3_1(bg, screen):
                         centerX_hero, centerY_hero = hero.rect.center
                         centerX_bullet_2, centerY_bullet_2 = bullet_2.rect.center
 
-                        dx_2 = centerX_hero - centerX_bullet_2
-                        dy_2 = centerY_hero - centerY_bullet_2
+                        dx_2 = centerX_hero - centerX_archer_2
+                        dy_2 = centerY_hero - centerY_archer_2
                         c_2 = (dx_2 ** 2 + dy_2 ** 2) ** 0.5
 
                     if len(bullets_2) > 0:
-                        if c_2 > 500 and len(bullets_2) != 0:
+                        if c_2 > 400 and len(bullets_2) != 0:
                             enemies.remove(bullet_2)
                             entities.remove(bullet_2)
                             bullets_2.remove(bullet_2)
@@ -1729,19 +1729,19 @@ def level_3_1(bg, screen):
 
                         centerX_hero, centerY_hero = hero.rect.center
                         centerX_bullet_3, centerY_bullet_3 = bullet_3.rect.center
-                        dx_3 = centerX_hero - centerX_bullet_3
-                        dy_3 = centerY_hero - centerY_bullet_3
+                        dx_3 = centerX_hero - centerX_archer_3
+                        dy_3 = centerY_hero - centerY_archer_3
                         c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
 
                     if len(bullets_3) > 0:
-                        if c_3 > 500 and len(bullets_3) != 0:
+                        if c_3 > 400 and len(bullets_3) != 0:
                             enemies.remove(bullet_3)
                             entities.remove(bullet_3)
                             bullets_3.remove(bullet_3)
                         if bullet_3.rect.x < WIN_WIDTH or bullet_3.rect.x > 0 or bullet_3.rect.y < WIN_HEIGHT \
                                 or bullet_3.rect.y > 0:
                             if len(bullets_3) != 0:
-                                bullet_3.update(enemy_image="bomb_mini", a=dx_3, b=dy_3, C=c_3)
+                                bullet_3.update(enemy_image="bomb", a=dx_3, b=dy_3, C=c_3)
                         if bullet_3.rect.x >= WIN_WIDTH or bullet_3.rect.x <= 0 or bullet_3.rect.y >= WIN_HEIGHT \
                                 or bullet_3.rect.y <= 0:
                             if len(bullets_3) != 0:
@@ -2088,9 +2088,9 @@ def level_3_2(bg, screen, hh, you_time):
                 if ((seconds + 1) // 1) % 10 == 0 and len(bullets) == 0 and centerX_boss_right > PLATFORM_WIDTH * 30:
                     r = random.random()
                     if r > 0.8:
-                        bullet = Enemy(centerX_boss_right, centerY_boss_right, 20, "bomb_big_green", color="green")
+                        bullet = Enemy(centerX_boss_right, centerY_boss_right, 12, "bomb_big_green", color="green")
                     if r <= 0.8:
-                        bullet = Enemy(centerX_boss_right, centerY_boss_right, 20, "bomb_big_purple")
+                        bullet = Enemy(centerX_boss_right, centerY_boss_right, 12, "bomb_big_purple")
                     bullets.append(bullet)
                     enemies.append(bullet)
                     entities.add(bullet)
@@ -2117,34 +2117,35 @@ def level_3_2(bg, screen, hh, you_time):
                         for p in platforms:
                             if sprite.collide_rect(arc, p):
                                 arc.onGround = True
-                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
-                        bullet_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT * 3, 10, "bomb_erase")
-                        bullets_1.append(bullet_1)
-                        enemies.append(bullet_1)
-                        entities.add(bullet_1)
-
-                        centerX_hero, centerY_hero = hero.rect.center
-                        centerX_bullet_1, centerY_bullet_1 = bullet_1.rect.center
-                        dx_1 = centerX_hero - centerX_bullet_1
-                        dy_1 = centerY_hero - centerY_bullet_1
-                        c_1 = (dx_1 ** 2 + dy_1 ** 2) ** 0.5
-
-                    if len(bullets_1) > 0:
-                        if c_1 > 500 and len(bullets_1) != 0:
-                            enemies.remove(bullet_1)
-                            entities.remove(bullet_1)
-                            bullets_1.remove(bullet_1)
-                        if bullet_1.rect.x < WIN_WIDTH or bullet_1.rect.x > 0 or bullet_1.rect.y < WIN_HEIGHT \
-                                or bullet_1.rect.y > 0:
-                            bullet_1.update(enemy_image="bomb", a=dx_1, b=dy_1, C=c_1)
-                        if bullet_1.rect.x >= WIN_WIDTH or bullet_1.rect.x <= 0 or bullet_1.rect.y >= WIN_HEIGHT \
-                                or bullet_1.rect.y <= 0:
-                            enemies.remove(bullet_1)
-                            entities.remove(bullet_1)
-                            bullets_1.remove(bullet_1)
+                    # if ((seconds + 1) // 1) % 3 == 0 and len(bullets_1) == 0:
+                    #     bullet_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT * 3, 10, "bomb_erase")
+                    #     bullets_1.append(bullet_1)
+                    #     enemies.append(bullet_1)
+                    #     entities.add(bullet_1)
+                    #
+                    #     centerX_hero, centerY_hero = hero.rect.center
+                    #     centerX_bullet_1, centerY_bullet_1 = bullet_1.rect.center
+                    #     dx_1 = centerX_hero - centerX_bullet_1
+                    #     dy_1 = centerY_hero - centerY_bullet_1
+                    #     c_1 = (dx_1 ** 2 + dy_1 ** 2) ** 0.5
+                    #
+                    # if len(bullets_1) > 0:
+                    #     if c_1 > 500 and len(bullets_1) != 0:
+                    #         enemies.remove(bullet_1)
+                    #         entities.remove(bullet_1)
+                    #         bullets_1.remove(bullet_1)
+                    #     if bullet_1.rect.x < WIN_WIDTH or bullet_1.rect.x > 0 or bullet_1.rect.y < WIN_HEIGHT \
+                    #             or bullet_1.rect.y > 0:
+                    #         bullet_1.update(enemy_image="bomb", a=dx_1, b=dy_1, C=c_1)
+                    #     if bullet_1.rect.x >= WIN_WIDTH or bullet_1.rect.x <= 0 or bullet_1.rect.y >= WIN_HEIGHT \
+                    #             or bullet_1.rect.y <= 0:
+                    #         enemies.remove(bullet_1)
+                    #         entities.remove(bullet_1)
+                    #         bullets_1.remove(bullet_1)
 
                     if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
-                        bullet_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT * 3, 10, "bomb_erase")
+                        centerX_archer_2, centerY_archer_2 = archer_enemy_2.rect.center
+                        bullet_2 = Enemy(centerX_archer_2, centerY_archer_2, 5, "bomb_mini")
                         bullets_2.append(bullet_2)
                         enemies.append(bullet_2)
                         entities.add(bullet_2)
@@ -2152,49 +2153,54 @@ def level_3_2(bg, screen, hh, you_time):
                         centerX_hero, centerY_hero = hero.rect.center
                         centerX_bullet_2, centerY_bullet_2 = bullet_2.rect.center
 
-                        dx_2 = centerX_hero - centerX_bullet_2
-                        dy_2 = centerY_hero - centerY_bullet_2
+                        dx_2 = centerX_hero - centerX_archer_2
+                        dy_2 = centerY_hero - centerY_archer_2
                         c_2 = (dx_2 ** 2 + dy_2 ** 2) ** 0.5
 
                     if len(bullets_2) > 0:
-                        if c_2 > 500 and len(bullets_2) != 0:
+                        if c_2 > 400 and len(bullets_2) != 0:
                             enemies.remove(bullet_2)
                             entities.remove(bullet_2)
                             bullets_2.remove(bullet_2)
                         if bullet_2.rect.x < WIN_WIDTH or bullet_2.rect.x > 0 or bullet_2.rect.y < WIN_HEIGHT \
                                 or bullet_2.rect.y > 0:
-                            bullet_2.update(enemy_image="bomb", a=dx_2, b=dy_2, C=c_2)
+                            if len(bullets_2) != 0:
+                                bullet_2.update(enemy_image="bomb", a=dx_2, b=dy_2, C=c_2)
                         if bullet_2.rect.x >= WIN_WIDTH or bullet_2.rect.x <= 0 or bullet_2.rect.y >= WIN_HEIGHT \
                                 or bullet_2.rect.y <= 0:
-                            enemies.remove(bullet_2)
-                            entities.remove(bullet_2)
-                            bullets_2.remove(bullet_2)
+                            if len(bullets_2) != 0:
+                                enemies.remove(bullet_2)
+                                entities.remove(bullet_2)
+                                bullets_2.remove(bullet_2)
 
                     if ((seconds + 1) // 1) % 3 == 0 and len(bullets_3) == 0:
-                        bullet_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT * 3, 5, "bomb_erase")
+                        centerX_archer_3, centerY_archer_3 = archer_enemy_3.rect.center
+                        bullet_3 = Enemy(centerX_archer_3, centerY_archer_3, 5, "bomb_mini")
                         bullets_3.append(bullet_3)
                         enemies.append(bullet_3)
                         entities.add(bullet_3)
 
                         centerX_hero, centerY_hero = hero.rect.center
                         centerX_bullet_3, centerY_bullet_3 = bullet_3.rect.center
-                        dx_3 = centerX_hero - centerX_bullet_3
-                        dy_3 = centerY_hero - centerY_bullet_3
+                        dx_3 = centerX_hero - centerX_archer_3
+                        dy_3 = centerY_hero - centerY_archer_3
                         c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
 
                     if len(bullets_3) > 0:
-                        if c_3 > PLATFORM_HEIGHT * 4 and len(bullets_3) != 0:
+                        if c_3 > 400 and len(bullets_3) != 0:
                             enemies.remove(bullet_3)
                             entities.remove(bullet_3)
                             bullets_3.remove(bullet_3)
                         if bullet_3.rect.x < WIN_WIDTH or bullet_3.rect.x > 0 or bullet_3.rect.y < WIN_HEIGHT \
                                 or bullet_3.rect.y > 0:
-                            bullet_3.update(enemy_image="bomb", a=dx_3, b=dy_3, C=c_3)
+                            if len(bullets_3) != 0:
+                                bullet_3.update(enemy_image="bomb", a=dx_3, b=dy_3, C=c_3)
                         if bullet_3.rect.x >= WIN_WIDTH or bullet_3.rect.x <= 0 or bullet_3.rect.y >= WIN_HEIGHT \
                                 or bullet_3.rect.y <= 0:
-                            enemies.remove(bullet_3)
-                            entities.remove(bullet_3)
-                            bullets_3.remove(bullet_3)
+                            if len(bullets_3) != 0:
+                                enemies.remove(bullet_3)
+                                entities.remove(bullet_3)
+                                bullets_3.remove(bullet_3)
 
                 for event in pygame.event.get():  # Обрабатываем события
                     if event.type == QUIT:

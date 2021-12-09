@@ -318,13 +318,18 @@ def gallery_menu(bg, screen):
 
 
 def options_menu(bg, screen):
-    global is_menu, menu_music, is_options_menu, is_landay, dict, amount_passed_levels
+    global is_menu, menu_music, is_options_menu, is_landay, dict, amount_passed_levels, is_karasev, is_einstein, \
+        is_red_key, is_yellow_key
 
     screen.fill(Color(GREEN))
 
     back_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Back')
     back_button.draw(screen)
+
+    god_mode_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 3 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                         WIN_HEIGHT / 15, 'God mode')
+    god_mode_button.draw(screen)
 
     music_off_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.5 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
                               WIN_HEIGHT / 15, 'Music off')
@@ -351,6 +356,21 @@ def options_menu(bg, screen):
                     is_menu = True
                     is_options_menu = False
                     run = False
+                if god_mode_button.is_pressed(mouse_pos, mouse_pressed):
+                    dict["is_yellow_key"] = 1
+                    dict["is_red_key"] = 1
+                    dict["amount_passed_levels"] = 3
+                    dict["is_landay"] = 1
+                    dict["is_einstein"] = 1
+                    dict["is_karasev"] = 1
+                    dict["your_time_seconds_1"] = 12.5
+                    dict["your_time_seconds_2"] = 60
+                    dict["your_time_seconds_3"] = 300
+                    dict["progress"] = 100
+                    with open("saves.json", 'w') as foo:
+                        json.dump(dict, foo)
+                    with open("saves.json", 'r') as foo:
+                        dict = json.load(foo)
                 if music_off_button.is_pressed(mouse_pos, mouse_pressed):
                     pygame.mixer.music.set_volume(0)
                     dict["music_volume"] = 0
@@ -368,8 +388,24 @@ def options_menu(bg, screen):
                 if reset_progress_button.is_pressed(mouse_pos, mouse_pressed):
                     amount_passed_levels = 0
                     is_landay = 0
+                    is_einstein = 0
+                    is_karasev = 0
+                    is_red_key = 0
+                    is_yellow_key = 0
+                    dict["is_yellow_key"] = 0
+                    dict["is_red_key"] = 0
                     dict["amount_passed_levels"] = 0
                     dict["is_landay"] = 0
+                    dict["is_einstein"] = 0
+                    dict["is_karasev"] = 0
+                    dict["progress"] = 0
+                    # dict["your_time_seconds_1"] = 12.5
+                    # dict["your_time_seconds_2"] = 60
+                    # dict["your_time_seconds_3"] = 300
+                    dict["progress"] = 0
+                    del dict["your_time_seconds_1"]
+                    del dict["your_time_seconds_2"]
+                    del dict["your_time_seconds_3"]
                     with open("saves.json", 'w') as foo:
                         json.dump(dict, foo)
                     with open("saves.json", 'r') as foo:
@@ -1537,7 +1573,7 @@ def level_3_1(bg, screen):
     archer_enemies.append(archer_enemy_1)
     archer_enemies.append(archer_enemy_2)
     archer_enemies.append(archer_enemy_3)
-    boss.health = 51
+    boss.health = 50
 
     level = [
         "                                                ",
@@ -1950,17 +1986,24 @@ def level_3_2(bg, screen, hh, you_time):
     archer_enemy_1 = Enemy(PLATFORM_WIDTH * 6, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
     archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
     archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, -PLATFORM_HEIGHT * 3, enemy_image="enemy_2_straight")
-    typical_enemy_1 = Enemy(WIN_WIDTH / 7, PLATFORM_HEIGHT * 10)
-    typical_enemy_2 = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 7.5, PLATFORM_HEIGHT * 5)
-    typical_enemy_3 = Enemy(WIN_WIDTH / 1.38, PLATFORM_HEIGHT * 7, 2)
+    typical_enemy_1 = Enemy(PLATFORM_WIDTH * 22, PLATFORM_HEIGHT * 2.5)
+    typical_enemy_2 = Enemy(PLATFORM_WIDTH * 33, PLATFORM_HEIGHT * 3)
+    typical_enemy_3 = Enemy(PLATFORM_WIDTH * 36, PLATFORM_HEIGHT * 8)
+    typical_enemy_4 = Enemy(PLATFORM_WIDTH * 36, PLATFORM_HEIGHT * 13.5)
+    typical_enemy_5 = Enemy(PLATFORM_WIDTH * 14.5, PLATFORM_HEIGHT * 9)
+    typical_enemy_6 = Enemy(PLATFORM_WIDTH * 12.5, PLATFORM_HEIGHT * 16.5)
     boss_right = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 6.5, WIN_HEIGHT / 2, enemy_image="boss_1_right")
     boss_left = Enemy(PLATFORM_WIDTH * 5, WIN_HEIGHT / 2, enemy_image="boss_1_left")
     entities.add(hero)
-    entities.add(boss_right, boss_left, typical_enemy_1, typical_enemy_2, typical_enemy_3)
+    entities.add(boss_right, boss_left, typical_enemy_1, typical_enemy_2, typical_enemy_3, typical_enemy_4,
+                 typical_enemy_5, typical_enemy_6)
     enemies.append(boss_right)
     enemies.append(typical_enemy_1)
     enemies.append(typical_enemy_2)
     enemies.append(typical_enemy_3)
+    enemies.append(typical_enemy_4)
+    enemies.append(typical_enemy_5)
+    enemies.append(typical_enemy_6)
     enemies.append(archer_enemy_1)
     enemies.append(archer_enemy_2)
     enemies.append(archer_enemy_3)
@@ -1973,25 +2016,25 @@ def level_3_2(bg, screen, hh, you_time):
         "                                                ",
         "                                                ",
         "                                                ",
-        "          ================  ==========          ",
+        "                   ======<                      ",
+        "                               ------           ",
+        "              -                                 ",
+        "                                                ",
+        "          -                 =                   ",
+        "                                                ",
+        "                                  -----         ",
+        "             ----    ===                        ",
+        "            -                                   ",
+        "                             ---                ",
+        "                                                ",
+        "           -       -              =====         ",
         "                                                ",
         "                                                ",
-        "                            =                   ",
+        "          ======      =     ==  ==              ",
         "                                                ",
         "                                                ",
         "                                                ",
-        "          ---------  -----------------          ",
-        "                                                ",
-        "                                                ",
-        "                   -                            ",
-        "                                                ",
-        "                -                               ",
-        "                                                ",
-        "          ================  ==========          ",
-        "                                                ",
-        "                                                ",
-        "                                                ",
-        "                                                ",
+        "                     ---      --                ",
         "                                                ",
         "                                                ",
         "________________________________________________"]
@@ -2009,7 +2052,7 @@ def level_3_2(bg, screen, hh, you_time):
                 entities.add(pfo)
                 platforms.append(pfo)
             if col == "<":
-                pfol = Platform(x - PLATFORM_WIDTH / 2, y)
+                pfol = Platform(x - PLATFORM_WIDTH / 2, y + PLATFORM_HEIGHT / 2)
                 entities.add(pfol)
                 platforms.append(pfol)
             if col == "*":
@@ -2042,9 +2085,12 @@ def level_3_2(bg, screen, hh, you_time):
 
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
-                typical_enemy_1.update()
+                typical_enemy_1.update(70)
                 typical_enemy_2.update()
                 typical_enemy_3.update()
+                typical_enemy_4.update()
+                typical_enemy_5.update()
+                typical_enemy_6.update(70)
 
                 date_time_obj2 = datetime.datetime.now()
                 time_delta_3 = date_time_obj2 - date_time_obj1 + you_time
@@ -2068,9 +2114,6 @@ def level_3_2(bg, screen, hh, you_time):
                 boss_right.update(move_counter=105, b=dy_2, d=boss_left.health / 100, enemy_image="boss_1_right",
                                   bottomleftX=right_bottomleftX,
                                   bottomleftY=right_bottomleftY, bottomrightX=right_bottomrightX)
-                typical_enemy_1.update()
-                typical_enemy_2.update()
-                typical_enemy_3.update()
 
                 if ((seconds + 5) // 1) % 10 == 0 and len(horizontal_bullets) == 0:
                     horizontal_bullet = Enemy(centerX_boss_left, centerY_boss_left, enemy_image="horizontal_attack")
@@ -2310,6 +2353,11 @@ def level_3_2(bg, screen, hh, you_time):
                         pass_level_screen(bg, screen, your_time, your_time_seconds)
                     run = False
                 entities.draw(screen)  # отображение
+
+                for l in lavas:
+                    if sprite.collide_rect(hero, l):
+                        hero.health = 0
+                        invisible_time = 0
 
                 pygame.display.update()
 

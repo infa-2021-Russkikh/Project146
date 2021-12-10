@@ -54,7 +54,7 @@ try:
 except KeyError:
     is_2 = 0
 try:
-    if dict["your_time_seconds_1"] <= 300:
+    if dict["your_time_seconds_3"] <= 180:
         is_3 = 1
     else:
         is_3 = 0
@@ -466,7 +466,7 @@ def achievements_menu(bg, screen):
         level_2_record.draw(screen, Color=WHITE)
 
     try:
-        if dict["your_time_seconds_2"] <= 300:
+        if dict["your_time_seconds_2"] <= 180:
             level_3_record.draw(screen, Color=WHITE)
         else:
             level_3_record.draw(screen, Color=RED)
@@ -730,11 +730,11 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
                                        0.000001, 'of 0:00:05:00')
         on_record_time_button.draw(screen, size=48, Color=WHITE)
 
-        if your_time_seconds > 300:
+        if your_time_seconds > 180:
             what_time_button = Button(RED, PLATFORM_WIDTH * 20.5, PLATFORM_HEIGHT * 13, 0.000001,
                                       0.000001, f'{your_time}')
             what_time_button.draw(screen, size=48, Color=RED)
-        if your_time_seconds <= 300:
+        if your_time_seconds <= 180:
             what_time_button = Button(RED, PLATFORM_WIDTH * 20.5, PLATFORM_HEIGHT * 13, 0.000001,
                                       0.000001, f'{your_time}')
             what_time_button.draw(screen, size=48, Color=GREEN)
@@ -846,7 +846,7 @@ def level_1(bg, screen):
     :return:
     """
     global is_game_over, running_1, is_menu, is_landay, menu_music, Number_of_level, amount_passed_levels, dict, \
-        switch_pause, date_time_obj4, is_pass_level_screen, is_red_key
+        switch_pause, date_time_obj4, is_pass_level_screen, is_red_key, progress
     Number_of_level = 1
 
     date_time_obj1 = datetime.datetime.now()
@@ -1039,8 +1039,13 @@ def level_1(bg, screen):
                         if landay:
                             is_landay = 1
                             dict["is_landay"] = 1
+                        progress = (dict["is_einstein"] + dict["is_landay"] + dict["is_karasev"] + dict["is_red_key"] +
+                                    dict["is_yellow_key"]
+                                    + dict["amount_passed_levels"] + is_1 + is_2 + is_3) * 100 // 11
                         with open("saves.json", 'w') as foo:
                             json.dump(dict, foo)
+                        with open("saves.json", 'r') as foo:
+                            dict = json.load(foo)
 
                         menu_music = False
                         is_pass_level_screen = True
@@ -1081,7 +1086,7 @@ def level_2(bg, screen):
     :return:
     """
     global is_game_over, running_2, is_menu, is_einstein, menu_music, Number_of_level, dict, switch_pause, \
-        date_time_obj4, dt, is_pass_level_screen, is_red_key
+        date_time_obj4, dt, is_pass_level_screen, is_red_key, progress
     Number_of_level = 2
 
     collect_gallery_feature_sound = pygame.mixer.Sound("Sounds/Collect_gallery_feature.wav")
@@ -1470,6 +1475,9 @@ def level_2(bg, screen):
                         if einstein:
                             is_einstein = 1
                             dict["is_einstein"] = 1
+                        progress = (dict["is_einstein"] + dict["is_landay"] + dict["is_karasev"] + dict["is_red_key"] +
+                                    dict["is_yellow_key"]
+                                    + dict["amount_passed_levels"] + is_1 + is_2 + is_3) * 100 // 11
                         with open("saves.json", 'w') as foo:
                             json.dump(dict, foo)
                         with open("saves.json", 'r') as foo:
@@ -1563,8 +1571,8 @@ def level_3_1(bg, screen):
     hurt = False
 
     # archer_enemy_1 = Enemy(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
-    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 4, enemy_image="enemy_2_straight")
-    archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, PLATFORM_HEIGHT * 5, enemy_image="enemy_2_straight")
+    # archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 4, enemy_image="enemy_2_straight")
+    # archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, PLATFORM_HEIGHT * 5, enemy_image="enemy_2_straight")
     archer_enemy_4 = Enemy(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
     archer_enemy_5 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
     archer_enemy_6 = Enemy(PLATFORM_WIDTH * 18, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
@@ -1573,13 +1581,7 @@ def level_3_1(bg, screen):
     entities.add(hero)
     entities.add(boss)
     enemies.append(boss)
-    # entities.add(boss, archer_enemy_1, archer_enemy_2, archer_enemy_3)
-    # enemies.append(archer_enemy_1)
-    # enemies.append(archer_enemy_2)
-    # enemies.append(archer_enemy_3)
-    # archer_enemies.append(archer_enemy_1)
-    # archer_enemies.append(archer_enemy_2)
-    # archer_enemies.append(archer_enemy_3)
+
     boss.health = 25
 
     level = [
@@ -1699,8 +1701,6 @@ def level_3_1(bg, screen):
 
                 if 75 >= boss.health > 50:
                     entities.add(archer_enemy_5, archer_enemy_6, archer_enemy_4)
-                    #enemies.append(archer_enemy_2)
-                    #enemies.append(archer_enemy_3)
                     enemies.append(archer_enemy_4)
                     enemies.append(archer_enemy_5)
                     enemies.append(archer_enemy_6)
@@ -1712,65 +1712,6 @@ def level_3_1(bg, screen):
                         for p in platforms:
                             if sprite.collide_rect(arc, p):
                                 arc.onGround = True
-
-                    # if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
-                    #     centerX_archer_2, centerY_archer_2 = archer_enemy_2.rect.center
-                    #     bullet_2 = Enemy(centerX_archer_2, centerY_archer_2, 5, "bomb_mini")
-                    #     bullets_2.append(bullet_2)
-                    #     enemies.append(bullet_2)
-                    #     entities.add(bullet_2)
-                    #
-                    #     centerX_hero, centerY_hero = hero.rect.center
-                    #     centerX_bullet_2, centerY_bullet_2 = bullet_2.rect.center
-                    #
-                    #     dx_2 = centerX_hero - centerX_archer_2
-                    #     dy_2 = centerY_hero - centerY_archer_2
-                    #     c_2 = (dx_2 ** 2 + dy_2 ** 2) ** 0.5
-                    #
-                    # if len(bullets_2) > 0:
-                    #     if c_2 > 400 and len(bullets_2) != 0:
-                    #         enemies.remove(bullet_2)
-                    #         entities.remove(bullet_2)
-                    #         bullets_2.remove(bullet_2)
-                    #     if bullet_2.rect.x < WIN_WIDTH or bullet_2.rect.x > 0 or bullet_2.rect.y < WIN_HEIGHT \
-                    #             or bullet_2.rect.y > 0:
-                    #         if len(bullets_2) != 0:
-                    #             bullet_2.update(enemy_image="bomb", a=dx_2, b=dy_2, C=c_2)
-                    #     if bullet_2.rect.x >= WIN_WIDTH or bullet_2.rect.x <= 0 or bullet_2.rect.y >= WIN_HEIGHT \
-                    #             or bullet_2.rect.y <= 0:
-                    #         if len(bullets_2) != 0:
-                    #             enemies.remove(bullet_2)
-                    #             entities.remove(bullet_2)
-                    #             bullets_2.remove(bullet_2)
-                    #
-                    # if ((seconds + 1) // 1) % 3 == 0 and len(bullets_3) == 0:
-                    #     centerX_archer_3, centerY_archer_3 = archer_enemy_3.rect.center
-                    #     bullet_3 = Enemy(centerX_archer_3, centerY_archer_3, 5, "bomb_mini")
-                    #     bullets_3.append(bullet_3)
-                    #     enemies.append(bullet_3)
-                    #     entities.add(bullet_3)
-                    #
-                    #     centerX_hero, centerY_hero = hero.rect.center
-                    #     centerX_bullet_3, centerY_bullet_3 = bullet_3.rect.center
-                    #     dx_3 = centerX_hero - centerX_archer_3
-                    #     dy_3 = centerY_hero - centerY_archer_3
-                    #     c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
-                    #
-                    # if len(bullets_3) > 0:
-                    #     if c_3 > 400 and len(bullets_3) != 0:
-                    #         enemies.remove(bullet_3)
-                    #         entities.remove(bullet_3)
-                    #         bullets_3.remove(bullet_3)
-                    #     if bullet_3.rect.x < WIN_WIDTH or bullet_3.rect.x > 0 or bullet_3.rect.y < WIN_HEIGHT \
-                    #             or bullet_3.rect.y > 0:
-                    #         if len(bullets_3) != 0:
-                    #             bullet_3.update(enemy_image="bomb", a=dx_3, b=dy_3, C=c_3)
-                    #     if bullet_3.rect.x >= WIN_WIDTH or bullet_3.rect.x <= 0 or bullet_3.rect.y >= WIN_HEIGHT \
-                    #             or bullet_3.rect.y <= 0:
-                    #         if len(bullets_3) != 0:
-                    #             enemies.remove(bullet_3)
-                    #             entities.remove(bullet_3)
-                    #             bullets_3.remove(bullet_3)
 
                     if ((seconds + 1) // 1) % 3 == 0 and len(bullets_4) == 0:
                         centerX_archer_4, centerY_archer_4 = archer_enemy_4.rect.center
@@ -1860,35 +1801,6 @@ def level_3_1(bg, screen):
                     running_3_1 = 0
                     running_3_2 = 1
                     level_3_2(bg, screen, hh, time_delta)
-
-                if boss.health <= 0:
-                    bottomleftX, bottomleftY = boss.rect.bottomleft
-                    bottomrightX, bottomrightY = boss.rect.bottomright
-                    pygame.draw.rect(screen, RED, (bottomleftX, bottomleftY,
-                                                   (bottomrightX - bottomleftX), PLATFORM_HEIGHT / 4))
-                    your_time = time_delta_2
-                    timestr = f'{your_time}'
-                    ftr = [3600, 60, 1, 10 ** (-6)]
-                    your_time_seconds = sum([a * b for a, b in zip(ftr, map(float, timestr.split(':')))])
-                    try:
-                        if your_time_seconds < dict["your_time_seconds_2"]:
-                            dict["your_time_seconds_2"] = your_time_seconds
-                    except KeyError:
-                        dict["your_time_seconds_2"] = your_time_seconds
-
-                    dict["amount_passed_levels"] = 2
-                    dict["health"] = hero.health
-
-                    with open("saves.json", 'w') as foo:
-                        json.dump(dict, foo)
-                    with open("saves.json", 'r') as foo:
-                        dict = json.load(foo)
-
-                    menu_music = False
-                    is_pass_level_screen = True
-                    while is_pass_level_screen:
-                        pass_level_screen(bg, screen, your_time, your_time_seconds)
-                    run = False
 
                 for event in pygame.event.get():  # Обрабатываем события
                     if event.type == QUIT:
@@ -2020,7 +1932,7 @@ def level_3_2(bg, screen, hh, you_time):
         :return:
         """
     global is_game_over, running_3_1, running_3_2, is_menu, is_landay, menu_music, Number_of_level, \
-        amount_passed_levels, dict, switch_pause, date_time_obj4, is_pass_level_screen, is_hiryanov_menu
+        amount_passed_levels, dict, switch_pause, date_time_obj4, is_pass_level_screen, is_hiryanov_menu, progress
     Number_of_level = 32
 
     invisible_time = 0
@@ -2058,17 +1970,17 @@ def level_3_2(bg, screen, hh, you_time):
 
     # archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 4, enemy_image="enemy_2_straight")
     # archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, PLATFORM_HEIGHT * 5, enemy_image="enemy_2_straight")
-    archer_enemy_4 = Enemy(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
-    archer_enemy_5 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
-    archer_enemy_6 = Enemy(PLATFORM_WIDTH * 18, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
+    archer_enemy_4 = Enemy(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 1.5, enemy_image="enemy_2_straight")
+    archer_enemy_5 = Enemy(PLATFORM_WIDTH * 22, PLATFORM_HEIGHT * 1.5, enemy_image="enemy_2_straight")
+    archer_enemy_6 = Enemy(PLATFORM_WIDTH * 38, PLATFORM_HEIGHT * 1.5, enemy_image="enemy_2_straight")
     typical_enemy_1 = Enemy(PLATFORM_WIDTH * 22, PLATFORM_HEIGHT * 2.5)
     typical_enemy_2 = Enemy(PLATFORM_WIDTH * 33, PLATFORM_HEIGHT * 3)
     typical_enemy_3 = Enemy(PLATFORM_WIDTH * 36, PLATFORM_HEIGHT * 8)
     typical_enemy_4 = Enemy(PLATFORM_WIDTH * 36, PLATFORM_HEIGHT * 13.5)
     typical_enemy_5 = Enemy(PLATFORM_WIDTH * 14.5, PLATFORM_HEIGHT * 9)
     typical_enemy_6 = Enemy(PLATFORM_WIDTH * 12.5, PLATFORM_HEIGHT * 16.5)
-    boss_right = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 6.5, WIN_HEIGHT / 2, enemy_image="boss_1_right")
-    boss_left = Enemy(PLATFORM_WIDTH * 5, WIN_HEIGHT / 2, enemy_image="boss_1_left")
+    boss_right = Enemy(WIN_WIDTH - PLATFORM_WIDTH * 6, WIN_HEIGHT / 2, enemy_image="boss_1_right")
+    boss_left = Enemy(PLATFORM_WIDTH * 3.5, WIN_HEIGHT / 2, enemy_image="boss_1_left")
     entities.add(hero)
     entities.add(boss_right, boss_left, typical_enemy_1, typical_enemy_2, typical_enemy_3, typical_enemy_4,
                  typical_enemy_5, typical_enemy_6)
@@ -2079,13 +1991,9 @@ def level_3_2(bg, screen, hh, you_time):
     enemies.append(typical_enemy_4)
     enemies.append(typical_enemy_5)
     enemies.append(typical_enemy_6)
-    enemies.append(archer_enemy_4)
-    enemies.append(archer_enemy_5)
-    enemies.append(archer_enemy_6)
-    archer_enemies.append(archer_enemy_4)
-    archer_enemies.append(archer_enemy_5)
-    archer_enemies.append(archer_enemy_6)
     enemies.append(boss_left)
+
+    switch = True
 
     level = [
         "                                                ",
@@ -2197,7 +2105,7 @@ def level_3_2(bg, screen, hh, you_time):
                     boss_left.update(b=dy_1, d=boss_left.health / 100, enemy_image="boss_1_left",
                                      bottomleftX=left_bottomleftX,
                                      bottomleftY=left_bottomleftY, bottomrightX=left_bottomrightX, s=seconds % 10,
-                                     topleftX=left_topleftX, topleftY=left_topleftY)
+                                     topleftX=left_topleftX, topleftY=left_topleftY, move_counter=90)
                     if ((seconds + 5) // 1) % 10 == 0 and len(horizontal_bullets) == 0:
                         horizontal_bullet = Enemy(centerX_boss_left, centerY_boss_left, enemy_image="horizontal_attack")
                         horizontal_bullets.append(horizontal_bullet)
@@ -2210,12 +2118,15 @@ def level_3_2(bg, screen, hh, you_time):
                             enemies.remove(horizontal_bullet)
                             entities.remove(horizontal_bullet)
                             horizontal_bullets.remove(horizontal_bullet)
+                elif boss_left.health == 0 and switch:
+                    enemies.remove(boss_left)
+                    switch = False
 
                 if boss_right.health > 0:
-                    boss_right.update(move_counter=105, b=dy_2, d=boss_left.health / 100, enemy_image="boss_1_right",
+                    boss_right.update(move_counter=95, b=dy_2, d=boss_left.health / 100, enemy_image="boss_1_right",
                                       bottomleftX=right_bottomleftX,
                                       bottomleftY=right_bottomleftY, bottomrightX=right_bottomrightX)
-                    if ((seconds + 1) // 1) % 10 == 0 and len(bullets) == 0 and centerX_boss_right > PLATFORM_WIDTH * 30:
+                    if ((seconds + 1) // 1) % 6 == 0 and len(bullets) == 0 and centerX_boss_right > PLATFORM_WIDTH * 30:
                         r = random.random()
                         if r > 0.8:
                             bullet = Enemy(centerX_boss_right, centerY_boss_right, 12, "bomb_big_green", color="green")
@@ -2240,8 +2151,18 @@ def level_3_2(bg, screen, hh, you_time):
                             enemies.remove(bullet)
                             entities.remove(bullet)
                             bullets.remove(bullet)
+                elif boss_right.health == 0 and switch:
+                    enemies.remove(boss_right)
+                    switch = False
 
                 if boss_left.health == 0 or boss_right.health == 0:
+                    entities.add(archer_enemy_5, archer_enemy_6, archer_enemy_4)
+                    enemies.append(archer_enemy_4)
+                    enemies.append(archer_enemy_5)
+                    enemies.append(archer_enemy_6)
+                    archer_enemies.append(archer_enemy_5)
+                    archer_enemies.append(archer_enemy_6)
+                    archer_enemies.append(archer_enemy_4)
                     for arc in archer_enemies:
                         arc.update(enemy_image="enemy_2_straight")
                         for p in platforms:
@@ -2363,9 +2284,9 @@ def level_3_2(bg, screen, hh, you_time):
                         switch_pause = True
                     if event.type == MOUSEBUTTONDOWN:
                         try:
-                            if centerX_boss_right - centerX_hero < 80:
+                            if abs(centerX_boss_right - centerX_hero) < 90 and abs(centerY_hero - centerY_boss_right) < 102:
                                 boss_right.health -= 4
-                            if centerX_boss_left - centerX_hero < 80:
+                            if abs(centerX_boss_left - centerX_hero) < 90 and abs(centerY_hero - centerY_boss_left) < 102:
                                 boss_left.health -= 4
                             if bullet.color == "green":
                                 centerX_hero, centerY_hero = hero.rect.center
@@ -2428,6 +2349,9 @@ def level_3_2(bg, screen, hh, you_time):
                     dict["amount_passed_levels"] = 3
                     dict["health"] = hero.health
                     dict["is_karasev"] = 1
+                    progress = (dict["is_einstein"] + dict["is_landay"] + dict["is_karasev"] + dict["is_red_key"] +
+                                dict["is_yellow_key"]
+                                + dict["amount_passed_levels"] + is_1 + is_2 + is_3) * 100 // 11
                     with open("saves.json", 'w') as foo:
                         json.dump(dict, foo)
                     with open("saves.json", 'r') as foo:
@@ -2439,6 +2363,26 @@ def level_3_2(bg, screen, hh, you_time):
                         pass_level_screen(bg, screen, your_time, your_time_seconds)
                     run = False
                 entities.draw(screen)  # отображение
+
+                if hero.health == 100:
+                    xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(xp, (PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                    if dict["is_yellow_key"] == 1:
+                        empty_double_xp = pygame.image.load("Textures/hud_heartEmpty.png")
+                        screen.blit(empty_double_xp, (5 * PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                elif hero.health == 200:
+                    xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(xp, (PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+                    double_xp = pygame.image.load("Textures/hud_heartFull.png")
+                    screen.blit(double_xp, (5 * PLATFORM_WIDTH / 2, PLATFORM_HEIGHT / 2))
+
+                date_time_obj3 = datetime.datetime.now()
+                time_delta_2 = date_time_obj3 - date_time_obj1 - dt
+
+                time_button = Button(RED, PLATFORM_WIDTH * 43, PLATFORM_HEIGHT / 2,
+                                     0.000001,
+                                     0.000001, f'{time_delta_2}')
+                time_button.draw(screen, Color=WHITE, size=36)
 
                 for l in lavas:
                     if sprite.collide_rect(hero, l):
@@ -2510,6 +2454,9 @@ def main():
         elif is_achievements_menu:
             while is_achievements_menu:
                 achievements_menu(bg, screen)
+        elif is_hiryanov_menu:
+            while is_hiryanov_menu:
+                hiryanov_menu(bg, screen)
         else:
             runnin = False
 

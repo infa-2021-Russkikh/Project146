@@ -2113,7 +2113,7 @@ def level_3_2(bg, screen, hh, you_time):
         "                                                ",
         "                                                ",
         "________________________________________________"]
-    boss_left.health = 0
+    boss_left.health = 1
     boss_right.health = 1
 
     x = y = 0  # координаты
@@ -2184,52 +2184,62 @@ def level_3_2(bg, screen, hh, you_time):
 
                 dy_1 = centerY_hero - centerY_boss_right
                 dy_2 = centerY_hero - centerY_boss_left
-                boss_left.update(b=dy_1, d=boss_left.health / 100, enemy_image="boss_1_left",
-                                 bottomleftX=left_bottomleftX,
-                                 bottomleftY=left_bottomleftY, bottomrightX=left_bottomrightX, s=seconds % 10,
-                                 topleftX=left_topleftX, topleftY=left_topleftY)
-                boss_right.update(move_counter=105, b=dy_2, d=boss_left.health / 100, enemy_image="boss_1_right",
-                                  bottomleftX=right_bottomleftX,
-                                  bottomleftY=right_bottomleftY, bottomrightX=right_bottomrightX)
 
-                if ((seconds + 5) // 1) % 10 == 0 and len(horizontal_bullets) == 0:
-                    horizontal_bullet = Enemy(centerX_boss_left, centerY_boss_left, enemy_image="horizontal_attack")
-                    horizontal_bullets.append(horizontal_bullet)
-                    enemies.append(horizontal_bullet)
-                    entities.add(horizontal_bullet)
-                    cooldown = FPS * 1.5
-                if len(horizontal_bullets) > 0:
-                    cooldown -= 1
-                    if cooldown == 0:
-                        enemies.remove(horizontal_bullet)
-                        entities.remove(horizontal_bullet)
-                        horizontal_bullets.remove(horizontal_bullet)
+                if boss_left.health > 0:
+                    if 8 < (seconds + 5) % 10 <= 8.5:
+                        boss_left.image.fill(WHITE)
+                    elif 8.5 < (seconds + 5) % 10 <= 9:
+                        boss_left.image = image.load('Textures/boss_1_left.png')
+                    if 9 < (seconds + 5) % 10 <= 9.5:
+                        boss_left.image.fill(WHITE)
+                    elif 9.5 < (seconds + 5) % 10 <= 9.99999:
+                        boss_left.image = image.load('Textures/boss_1_left.png')
+                    boss_left.update(b=dy_1, d=boss_left.health / 100, enemy_image="boss_1_left",
+                                     bottomleftX=left_bottomleftX,
+                                     bottomleftY=left_bottomleftY, bottomrightX=left_bottomrightX, s=seconds % 10,
+                                     topleftX=left_topleftX, topleftY=left_topleftY)
+                    if ((seconds + 5) // 1) % 10 == 0 and len(horizontal_bullets) == 0:
+                        horizontal_bullet = Enemy(centerX_boss_left, centerY_boss_left, enemy_image="horizontal_attack")
+                        horizontal_bullets.append(horizontal_bullet)
+                        enemies.append(horizontal_bullet)
+                        entities.add(horizontal_bullet)
+                        cooldown = FPS * 1.5
+                    if len(horizontal_bullets) > 0:
+                        cooldown -= 1
+                        if cooldown == 0:
+                            enemies.remove(horizontal_bullet)
+                            entities.remove(horizontal_bullet)
+                            horizontal_bullets.remove(horizontal_bullet)
 
-                if ((seconds + 1) // 1) % 10 == 0 and len(bullets) == 0 and centerX_boss_right > PLATFORM_WIDTH * 30:
-                    r = random.random()
-                    if r > 0.8:
-                        bullet = Enemy(centerX_boss_right, centerY_boss_right, 12, "bomb_big_green", color="green")
-                    if r <= 0.8:
-                        bullet = Enemy(centerX_boss_right, centerY_boss_right, 12, "bomb_big_purple")
-                    bullets.append(bullet)
-                    enemies.append(bullet)
-                    entities.add(bullet)
+                if boss_right.health > 0:
+                    boss_right.update(move_counter=105, b=dy_2, d=boss_left.health / 100, enemy_image="boss_1_right",
+                                      bottomleftX=right_bottomleftX,
+                                      bottomleftY=right_bottomleftY, bottomrightX=right_bottomrightX)
+                    if ((seconds + 1) // 1) % 10 == 0 and len(bullets) == 0 and centerX_boss_right > PLATFORM_WIDTH * 30:
+                        r = random.random()
+                        if r > 0.8:
+                            bullet = Enemy(centerX_boss_right, centerY_boss_right, 12, "bomb_big_green", color="green")
+                        if r <= 0.8:
+                            bullet = Enemy(centerX_boss_right, centerY_boss_right, 12, "bomb_big_purple")
+                        bullets.append(bullet)
+                        enemies.append(bullet)
+                        entities.add(bullet)
 
-                    centerX_hero, centerY_hero = hero.rect.center
-                    centerX_bullet, centerY_bullet = bullet.rect.center
-                    dx = centerX_hero - centerX_bullet
-                    dy = centerY_hero - centerY_bullet
-                    c = (dx ** 2 + dy ** 2) ** 0.5
+                        centerX_hero, centerY_hero = hero.rect.center
+                        centerX_bullet, centerY_bullet = bullet.rect.center
+                        dx = centerX_hero - centerX_bullet
+                        dy = centerY_hero - centerY_bullet
+                        c = (dx ** 2 + dy ** 2) ** 0.5
 
-                if len(bullets) > 0:
-                    if bullet.rect.x < WIN_WIDTH or bullet.rect.x > 0 or bullet.rect.y < WIN_HEIGHT \
-                            or bullet.rect.y > 0:
-                        bullet.update(enemy_image="bomb_big_green", a=dx, b=dy, C=c)
-                    if bullet.rect.x >= WIN_WIDTH or bullet.rect.x <= 0 or bullet.rect.y >= WIN_HEIGHT \
-                            or bullet.rect.y <= 0:
-                        enemies.remove(bullet)
-                        entities.remove(bullet)
-                        bullets.remove(bullet)
+                    if len(bullets) > 0:
+                        if bullet.rect.x < WIN_WIDTH or bullet.rect.x > 0 or bullet.rect.y < WIN_HEIGHT \
+                                or bullet.rect.y > 0:
+                            bullet.update(enemy_image="bomb_big_green", a=dx, b=dy, C=c)
+                        if bullet.rect.x >= WIN_WIDTH or bullet.rect.x <= 0 or bullet.rect.y >= WIN_HEIGHT \
+                                or bullet.rect.y <= 0:
+                            enemies.remove(bullet)
+                            entities.remove(bullet)
+                            bullets.remove(bullet)
 
                 if boss_left.health == 0 or boss_right.health == 0:
                     for arc in archer_enemies:

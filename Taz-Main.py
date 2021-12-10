@@ -1580,7 +1580,7 @@ def level_3_1(bg, screen):
     # archer_enemies.append(archer_enemy_1)
     # archer_enemies.append(archer_enemy_2)
     # archer_enemies.append(archer_enemy_3)
-    boss.health = 75
+    boss.health = 25
 
     level = [
         "                                                ",
@@ -2045,6 +2045,8 @@ def level_3_2(bg, screen, hh, you_time):
     bullets_2 = []
     bullets_3 = []
     bullets_4 = []
+    bullets_5 = []
+    bullets_6 = []
     horizontal_bullets = []
     archer_enemies = []
 
@@ -2054,9 +2056,11 @@ def level_3_2(bg, screen, hh, you_time):
         heart = False
     hurt = False
 
-    archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 4, enemy_image="enemy_2_straight")
-    archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, PLATFORM_HEIGHT * 5, enemy_image="enemy_2_straight")
+    # archer_enemy_2 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 4, enemy_image="enemy_2_straight")
+    # archer_enemy_3 = Enemy(PLATFORM_WIDTH * 19, PLATFORM_HEIGHT * 5, enemy_image="enemy_2_straight")
     archer_enemy_4 = Enemy(PLATFORM_WIDTH * 6, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
+    archer_enemy_5 = Enemy(PLATFORM_WIDTH * 12, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
+    archer_enemy_6 = Enemy(PLATFORM_WIDTH * 18, PLATFORM_HEIGHT * 2.5, enemy_image="enemy_2_straight")
     typical_enemy_1 = Enemy(PLATFORM_WIDTH * 22, PLATFORM_HEIGHT * 2.5)
     typical_enemy_2 = Enemy(PLATFORM_WIDTH * 33, PLATFORM_HEIGHT * 3)
     typical_enemy_3 = Enemy(PLATFORM_WIDTH * 36, PLATFORM_HEIGHT * 8)
@@ -2076,11 +2080,11 @@ def level_3_2(bg, screen, hh, you_time):
     enemies.append(typical_enemy_5)
     enemies.append(typical_enemy_6)
     enemies.append(archer_enemy_4)
-    enemies.append(archer_enemy_2)
-    enemies.append(archer_enemy_3)
+    enemies.append(archer_enemy_5)
+    enemies.append(archer_enemy_6)
     archer_enemies.append(archer_enemy_4)
-    archer_enemies.append(archer_enemy_2)
-    archer_enemies.append(archer_enemy_3)
+    archer_enemies.append(archer_enemy_5)
+    archer_enemies.append(archer_enemy_6)
     enemies.append(boss_left)
 
     level = [
@@ -2109,6 +2113,8 @@ def level_3_2(bg, screen, hh, you_time):
         "                                                ",
         "                                                ",
         "________________________________________________"]
+    boss_left.health = 0
+    boss_right.health = 1
 
     x = y = 0  # координаты
     for row in level:  # вся строка
@@ -2260,64 +2266,60 @@ def level_3_2(bg, screen, hh, you_time):
                                 entities.remove(bullet_4)
                                 bullets_4.remove(bullet_4)
 
-                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_2) == 0:
-                        centerX_archer_2, centerY_archer_2 = archer_enemy_2.rect.center
-                        bullet_2 = Enemy(centerX_archer_2, centerY_archer_2, 5, "bomb_mini")
-                        bullets_2.append(bullet_2)
-                        enemies.append(bullet_2)
-                        entities.add(bullet_2)
+                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_5) == 0:
+                        centerX_archer_5, centerY_archer_5 = archer_enemy_5.rect.center
+                        bullet_5 = Enemy(centerX_archer_5, centerY_archer_5, 5, "bomb_mini")
+                        bullets_5.append(bullet_5)
+                        enemies.append(bullet_5)
+                        entities.add(bullet_5)
 
                         centerX_hero, centerY_hero = hero.rect.center
-                        centerX_bullet_2, centerY_bullet_2 = bullet_2.rect.center
+                        centerX_bullet_5, centerY_bullet_5 = bullet_5.rect.center
+                        dx_5 = centerX_hero - centerX_bullet_5
+                        dy_5 = centerY_hero - centerY_bullet_5
+                        c_5 = (dx_5 ** 2 + dy_5 ** 2) ** 0.5
 
-                        dx_2 = centerX_hero - centerX_archer_2
-                        dy_2 = centerY_hero - centerY_archer_2
-                        c_2 = (dx_2 ** 2 + dy_2 ** 2) ** 0.5
+                    if len(bullets_5) > 0:
+                        if c_5 > 500 and len(bullets_5) != 0:
+                            enemies.remove(bullet_5)
+                            entities.remove(bullet_5)
+                            bullets_5.remove(bullet_5)
+                        if bullet_5.rect.x < WIN_WIDTH or bullet_5.rect.x > 0 or bullet_5.rect.y < WIN_HEIGHT \
+                                or bullet_5.rect.y > 0:
+                            bullet_5.update(enemy_image="bomb_mini", a=dx_5, b=dy_5, C=c_5)
+                        if bullet_5.rect.x >= WIN_WIDTH or bullet_5.rect.x <= 0 or bullet_5.rect.y >= WIN_HEIGHT \
+                                or bullet_5.rect.y <= 0:
+                            enemies.remove(bullet_5)
+                            entities.remove(bullet_5)
+                            bullets_5.remove(bullet_5)
 
-                    if len(bullets_2) > 0:
-                        if c_2 > 400 and len(bullets_2) != 0:
-                            enemies.remove(bullet_2)
-                            entities.remove(bullet_2)
-                            bullets_2.remove(bullet_2)
-                        if bullet_2.rect.x < WIN_WIDTH or bullet_2.rect.x > 0 or bullet_2.rect.y < WIN_HEIGHT \
-                                or bullet_2.rect.y > 0:
-                            if len(bullets_2) != 0:
-                                bullet_2.update(enemy_image="bomb", a=dx_2, b=dy_2, C=c_2)
-                        if bullet_2.rect.x >= WIN_WIDTH or bullet_2.rect.x <= 0 or bullet_2.rect.y >= WIN_HEIGHT \
-                                or bullet_2.rect.y <= 0:
-                            if len(bullets_2) != 0:
-                                enemies.remove(bullet_2)
-                                entities.remove(bullet_2)
-                                bullets_2.remove(bullet_2)
-
-                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_3) == 0:
-                        centerX_archer_3, centerY_archer_3 = archer_enemy_3.rect.center
-                        bullet_3 = Enemy(centerX_archer_3, centerY_archer_3, 5, "bomb_mini")
-                        bullets_3.append(bullet_3)
-                        enemies.append(bullet_3)
-                        entities.add(bullet_3)
+                    if ((seconds + 1) // 1) % 3 == 0 and len(bullets_6) == 0:
+                        centerX_archer_6, centerY_archer_6 = archer_enemy_6.rect.center
+                        bullet_6 = Enemy(centerX_archer_6, centerY_archer_6, 5, "bomb_mini")
+                        bullets_6.append(bullet_6)
+                        enemies.append(bullet_6)
+                        entities.add(bullet_6)
 
                         centerX_hero, centerY_hero = hero.rect.center
-                        centerX_bullet_3, centerY_bullet_3 = bullet_3.rect.center
-                        dx_3 = centerX_hero - centerX_archer_3
-                        dy_3 = centerY_hero - centerY_archer_3
-                        c_3 = (dx_3 ** 2 + dy_3 ** 2) ** 0.5
+                        centerX_bullet_6, centerY_bullet_6 = bullet_6.rect.center
+                        dx_6 = centerX_hero - centerX_bullet_6
+                        dy_6 = centerY_hero - centerY_bullet_6
+                        c_6 = (dx_6 ** 2 + dy_6 ** 2) ** 0.5
 
-                    if len(bullets_3) > 0:
-                        if c_3 > 400 and len(bullets_3) != 0:
-                            enemies.remove(bullet_3)
-                            entities.remove(bullet_3)
-                            bullets_3.remove(bullet_3)
-                        if bullet_3.rect.x < WIN_WIDTH or bullet_3.rect.x > 0 or bullet_3.rect.y < WIN_HEIGHT \
-                                or bullet_3.rect.y > 0:
-                            if len(bullets_3) != 0:
-                                bullet_3.update(enemy_image="bomb", a=dx_3, b=dy_3, C=c_3)
-                        if bullet_3.rect.x >= WIN_WIDTH or bullet_3.rect.x <= 0 or bullet_3.rect.y >= WIN_HEIGHT \
-                                or bullet_3.rect.y <= 0:
-                            if len(bullets_3) != 0:
-                                enemies.remove(bullet_3)
-                                entities.remove(bullet_3)
-                                bullets_3.remove(bullet_3)
+                    if len(bullets_6) > 0:
+                        if c_6 > 500 and len(bullets_6) != 0:
+                            enemies.remove(bullet_6)
+                            entities.remove(bullet_6)
+                            bullets_6.remove(bullet_6)
+                        if bullet_6.rect.x < WIN_WIDTH or bullet_6.rect.x > 0 or bullet_6.rect.y < WIN_HEIGHT \
+                                or bullet_6.rect.y > 0:
+                            bullet_6.update(enemy_image="bomb_mini", a=dx_6, b=dy_6, C=c_6)
+                        if bullet_6.rect.x >= WIN_WIDTH or bullet_6.rect.x <= 0 or bullet_6.rect.y >= WIN_HEIGHT \
+                                or bullet_6.rect.y <= 0:
+                            if len(bullets_6) > 0:
+                                enemies.remove(bullet_6)
+                                entities.remove(bullet_6)
+                                bullets_6.remove(bullet_6)
 
                 for event in pygame.event.get():  # Обрабатываем события
                     if event.type == QUIT:
@@ -2408,10 +2410,10 @@ def level_3_2(bg, screen, hh, you_time):
                     ftr = [3600, 60, 1, 10 ** (-6)]
                     your_time_seconds = sum([a * b for a, b in zip(ftr, map(float, timestr.split(':')))])
                     try:
-                        if your_time_seconds < dict["your_time_seconds_2"]:
-                            dict["your_time_seconds_2"] = your_time_seconds
+                        if your_time_seconds < dict["your_time_seconds_3"]:
+                            dict["your_time_seconds_3"] = your_time_seconds
                     except KeyError:
-                        dict["your_time_seconds_2"] = your_time_seconds
+                        dict["your_time_seconds_3"] = your_time_seconds
 
                     dict["amount_passed_levels"] = 3
                     dict["health"] = hero.health

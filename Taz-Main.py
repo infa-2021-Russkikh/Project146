@@ -1582,7 +1582,7 @@ def level_3_1(bg, screen):
     entities.add(boss)
     enemies.append(boss)
 
-    boss.health = 25
+    boss.health = 100
 
     level = [
         "                                                ",
@@ -1902,7 +1902,8 @@ def level_3_1(bg, screen):
 
                 for l in lavas:
                     if sprite.collide_rect(hero, l):
-                        hero.health = 0
+                        running_3_1 = 0
+                        is_game_over = True
 
             elif hero.health <= 0:
                 Number_of_level = 31
@@ -2021,8 +2022,8 @@ def level_3_2(bg, screen, hh, you_time):
         "                                                ",
         "                                                ",
         "________________________________________________"]
-    boss_left.health = 1
-    boss_right.health = 1
+    boss_left.health = 100
+    boss_right.health = 100
 
     x = y = 0  # координаты
     for row in level:  # вся строка
@@ -2388,6 +2389,8 @@ def level_3_2(bg, screen, hh, you_time):
                     if sprite.collide_rect(hero, l):
                         hero.health = 0
                         invisible_time = 0
+                        running_3_1 = 0
+                        is_game_over = True
 
                 pygame.display.update()
 

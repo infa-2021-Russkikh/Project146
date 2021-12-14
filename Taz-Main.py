@@ -149,7 +149,7 @@ def menu(bg, screen):
                         running_1 = True
                     if amount_passed_levels == 1:
                         running_2 = True
-                    if amount_passed_levels == 2:
+                    if amount_passed_levels >= 2:
                         running_3_1 = True
                     run = False
                 if quit_button.is_pressed(mouse_pos, mouse_pressed):
@@ -1643,6 +1643,7 @@ def level_3_1(bg, screen):
     run = True
     while run:
         timer.tick(FPS)
+
         if running_3_1 == 1:
 
             hero.collide_enemy(enemies, hero)
@@ -1879,6 +1880,19 @@ def level_3_1(bg, screen):
                     pass
 
                 entities.draw(screen)  # отображение
+                if seconds < 8:
+                    p_button = Button(RED, WIN_WIDTH / 2 - PLATFORM_WIDTH, PLATFORM_HEIGHT * 4, WIN_WIDTH / 1.8,
+                                      WIN_HEIGHT / 15, 'Click left mouse button to')
+                    p_button.draw(screen)
+
+                    h_button = Button(RED, WIN_WIDTH / 2 - PLATFORM_WIDTH, PLATFORM_HEIGHT * 6, WIN_WIDTH / 1.8,
+                                      WIN_HEIGHT / 15, 'attack the boss, when you')
+                    h_button.draw(screen)
+
+                    d_button = Button(RED, WIN_WIDTH / 2 - PLATFORM_WIDTH, PLATFORM_HEIGHT * 8, WIN_WIDTH / 1.8,
+                                      WIN_HEIGHT / 15, 'nearly him'
+                                                       ' or reflect green bomb')
+                    d_button.draw(screen, size=48)
 
                 if hero.health == 100:
                     xp = pygame.image.load("Textures/hud_heartFull.png")

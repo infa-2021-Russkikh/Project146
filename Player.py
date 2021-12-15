@@ -4,9 +4,9 @@ import ctypes
 import os
 import pyganim
 import importlib
-import Taz_Main
+#import Taz_Main
 
-from Taz_Main import *
+#from Taz_Main import *
 # необходимые константы
 COLOR = "#888888"
 user32 = ctypes.windll.user32
@@ -39,10 +39,10 @@ ANIMATION_JUMP_RIGHT = [('%s/FOPF/jr.png' % ICON_DIR, 0.1)]
 ANIMATION_JUMP = [('%s/FOPF/j.png' % ICON_DIR, 0.1)]
 ANIMATION_STAY = [('%s/FOPF/0.png' % ICON_DIR, 0.1)]
 
-
+k = 100 +god_mode *1000000
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y, HEALTH=100, invisible_time=0):
+    def __init__(self, x, y, HEALTH=k, invisible_time=0):
         sprite.Sprite.__init__(self)
         self.x_vel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень

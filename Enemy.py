@@ -1,6 +1,6 @@
 #импортируем необходимое
 import pygame.draw
-from Player import *
+from Taz_Main import *
 import ctypes
 #Константы
 user32 = ctypes.windll.user32

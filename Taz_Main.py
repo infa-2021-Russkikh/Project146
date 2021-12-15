@@ -771,16 +771,16 @@ def game_over(bg, screen):
     elif dict["is_yellow_key"] == 1:
         dict["health"] = 200
 
-    #restart_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                           # WIN_HEIGHT / 15, 'Restart')
-    #restart_button.draw(screen)
+    restart_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                            WIN_HEIGHT / 15, 'Restart')
+    restart_button.draw(screen)
 
     menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Menu')
     menu_button.draw(screen)
 
-    #game_over_text = Button(RED, WIN_WIDTH / 2, WIN_HEIGHT / 2 - WIN_HEIGHT / 7, 0.1, 0.1, 'GAME OVER ^_^')
-    #game_over_text.draw(screen)
+    game_over_text = Button(RED, WIN_WIDTH / 2, WIN_HEIGHT / 2 - WIN_HEIGHT / 7, 0.1, 0.1, 'GAME OVER ^_^')
+    game_over_text.draw(screen)
     pygame.display.update()
     run = True
     while run:
@@ -909,10 +909,18 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
                 mouse_pressed = pygame.mouse.get_pressed()
                 if next_level_button.is_pressed(mouse_pos, mouse_pressed):
                     dt = datetime.datetime.now() - datetime.datetime.now()
-                    is_menu = True
-                    running_1 = 0
-                    is_pass_level_screen = False
-                    menu_music = False
+                    if Number_of_level == 1:
+                        running_1 = 0
+                        is_pass_level_screen = False
+                        running_2 = 1
+                    elif Number_of_level == 2:
+                        running_2 = 0
+                        is_pass_level_screen = False
+                        running_3_1 = 1
+                    elif Number_of_level == 32:
+                        running_3_2 = 0
+                        is_hiryanov_menu = True
+                        is_pass_level_screen = False
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
                     dt = datetime.datetime.now() - datetime.datetime.now()
@@ -923,10 +931,14 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
                     run = False
                 if restart_button.is_pressed(mouse_pos, mouse_pressed):
                     dt = datetime.datetime.now() - datetime.datetime.now()
-                    is_menu = True
-                    running_1 = 0
-                    is_pass_level_screen = False
-                    menu_music = False
+                    if Number_of_level == 1:
+                        is_restart = True
+                        running_1 = 0
+                        is_pass_level_screen = False
+                    if Number_of_level == 2:
+                        is_restart = True
+                        is_pass_level_screen = False
+                        running_2 = 0
                     run = False
         pygame.display.update()
     pygame.mixer.music.unpause()

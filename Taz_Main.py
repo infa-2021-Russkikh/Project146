@@ -28,7 +28,8 @@ DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 ANIMATION_DELAY = 0.1  # скорость смены кадров
 ICON_DIR = os.path.dirname(__file__)  # Полный путь к каталогу с файлами
 up = False
-#Путь к спрайтам для фопфа
+god_mode = 0
+#Массивы с спрайтами
 ANIMATION_RIGHT = [('%s/FOPF/r1.png' % ICON_DIR),
                    ('%s/FOPF/r2.png' % ICON_DIR),
                    ('%s/FOPF/r3.png' % ICON_DIR),
@@ -44,7 +45,6 @@ ANIMATION_JUMP_RIGHT = [('%s/FOPF/jr.png' % ICON_DIR, 0.1)]
 ANIMATION_JUMP = [('%s/FOPF/j.png' % ICON_DIR, 0.1)]
 ANIMATION_STAY = [('%s/FOPF/0.png' % ICON_DIR, 0.1)]
 # Объявляем переменные
-god_mode = 0
 user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)
 WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
@@ -55,11 +55,68 @@ RED = (255, 0, 0)
 GREEN = (0, 155, 55)
 GREY = (50, 50, 50)
 dt = datetime.datetime.now() - datetime.datetime.now()
-# PLATFORM_WIDTH = WIN_WIDTH / 48
-# PLATFORM_HEIGHT = WIN_HEIGHT / 25.25
-# PLATFORM_COLOR = "#FF6262"
+
+
+k = 100
+with open("saves.json", 'r') as f:
+    dict = json.load(f)
+music_volume = dict["music_volume"]
+Number_of_level = 0
+gallery_pictures = []
+amount_passed_levels = dict["amount_passed_levels"]
+is_landay = dict["is_landay"]
+is_einstein = dict["is_einstein"]
+is_karasev = dict["is_karasev"]
+is_red_key = dict["is_red_key"]
+
+
+#снова что-то нужное для прогресса
+try:
+    if dict["your_time_seconds_1"] <= 12.5:
+        is_1 = 1
+    else:
+        is_1 = 0
+except KeyError:
+    is_1 = 0
+try:
+    if dict["your_time_seconds_2"] <= 60:
+        is_2 = 1
+    else:
+        is_2 = 0
+except KeyError:
+    is_2 = 0
+try:
+    if dict["your_time_seconds_3"] <= 180:
+        is_3 = 1
+    else:
+        is_3 = 0
+except KeyError:
+    is_3 = 0
+progress = (dict["is_einstein"] + dict["is_landay"] + dict["is_karasev"] + dict["is_red_key"] + dict["is_yellow_key"]
+            + dict["amount_passed_levels"] + is_1 + is_2 + is_3) * 100 // 11
+#маркеры для менюшек
+gallery_pictures.append(is_landay)
+is_menu = False
+is_options_menu = False
+is_gallery_menu = False
+menu_music = False
+is_levels = False
+is_game_over = False
+is_pass_level_screen = False
+is_hiryanov_menu = False
+running_1 = 0
+running_2 = 0
+running_3_1 = 0
+running_3_2 = 0
+is_pause_menu = False
+switch_pause = False
+is_restart = False
+is_achievements_menu = False
+
+up = False
+timer = pygame.time.Clock()
 class Player(sprite.Sprite):
-    def __init__(self, x, y, HEALTH=100, invisible_time=0):
+    def __init__(self, x, y, HEALTH = k , invisible_time=0):
         sprite.Sprite.__init__(self)
         self.x_vel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
@@ -158,61 +215,6 @@ class Player(sprite.Sprite):
         for en in enemies:
             if sprite.collide_rect(self, en):
                 hero.health -= 100 # может привести к смерти
-with open("saves.json", 'r') as f:
-    dict = json.load(f)
-music_volume = dict["music_volume"]
-Number_of_level = 0
-gallery_pictures = []
-amount_passed_levels = dict["amount_passed_levels"]
-is_landay = dict["is_landay"]
-is_einstein = dict["is_einstein"]
-is_karasev = dict["is_karasev"]
-is_red_key = dict["is_red_key"]
-god_mode = dict["god_mode"]
-try:
-    if dict["your_time_seconds_1"] <= 12.5:
-        is_1 = 1
-    else:
-        is_1 = 0
-except KeyError:
-    is_1 = 0
-try:
-    if dict["your_time_seconds_2"] <= 60:
-        is_2 = 1
-    else:
-        is_2 = 0
-except KeyError:
-    is_2 = 0
-try:
-    if dict["your_time_seconds_3"] <= 180:
-        is_3 = 1
-    else:
-        is_3 = 0
-except KeyError:
-    is_3 = 0
-progress = (dict["is_einstein"] + dict["is_landay"] + dict["is_karasev"] + dict["is_red_key"] + dict["is_yellow_key"]
-            + dict["amount_passed_levels"] + is_1 + is_2 + is_3) * 100 // 11
-gallery_pictures.append(is_landay)
-is_menu = False
-is_options_menu = False
-is_gallery_menu = False
-menu_music = False
-is_levels = False
-is_game_over = False
-is_pass_level_screen = False
-is_hiryanov_menu = False
-running_1 = 0
-running_2 = 0
-running_3_1 = 0
-running_3_2 = 0
-is_pause_menu = False
-switch_pause = False
-is_restart = False
-is_achievements_menu = False
-
-up = False
-timer = pygame.time.Clock()
-
 
 def menu(bg, screen):
     """
@@ -221,28 +223,29 @@ def menu(bg, screen):
     :param screen: general screen of window
     :return:
     """
-    global god_mode, running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict, is_achievements_menu, \
-        running_2, running_3_1, is_landay,is_einstein, is_karasev   
+    global god_mode, running_1, is_menu, is_levels, menu_music, is_gallery_menu, is_options_menu, dict, is_achievements_menu, k, running_2, running_3_1, is_landay,is_einstein, is_karasev  
+    running_2, running_3_1, is_landay,is_einstein, is_karasev  
     music_volume = dict["music_volume"]
     Number_of_level = 0
     gallery_pictures = []
+    #штуки для прогресса
     amount_passed_levels = dict["amount_passed_levels"]
     is_landay = dict["is_landay"]
     is_einstein = dict["is_einstein"]
     is_karasev = dict["is_karasev"]
     is_red_key = dict["is_red_key"]
     god_mode = dict["god_mode"]
+    k = 100 + god_mode * 10000000
     if not menu_music:
         pygame.mixer.music.set_volume(dict["music_volume"])
         pygame.mixer.music.load("Music/menu_music.mp3")
         pygame.mixer.music.play(-1)
-    # bg = pygame.image.load("Textures/additional task.png")
-    # screen.blit(bg, (0, 0))
+    
     screen.fill(Color(GREEN))
-
+    #сохранение
     with open("saves.json", 'r') as f:
         dict = json.load(f)
-
+    #рисовалка кнопок
     start_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 3, WIN_WIDTH / 3.2,
                           PLATFORM_HEIGHT * 2, 'Start/Continue')
     start_button.draw(screen)
@@ -334,7 +337,7 @@ def level_menu(bg, screen):
     level_1_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 4, WIN_WIDTH / 3.2,
                             WIN_HEIGHT / 15, 'Level 1')
     level_1_button.draw(screen)
-
+    #Рисовалка кнопок
     if amount_passed_levels < 1:
         level_2_button = Button(GREY, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, PLATFORM_HEIGHT * 8,
                                 WIN_WIDTH / 3.2,
@@ -768,16 +771,16 @@ def game_over(bg, screen):
     elif dict["is_yellow_key"] == 1:
         dict["health"] = 200
 
-    restart_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
-                            WIN_HEIGHT / 15, 'Restart')
-    restart_button.draw(screen)
+    #restart_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 2 - WIN_HEIGHT / 27, WIN_WIDTH / 3.2,
+                           # WIN_HEIGHT / 15, 'Restart')
+    #restart_button.draw(screen)
 
     menu_button = Button(RED, WIN_WIDTH / 2 - WIN_WIDTH / 6.2, WIN_HEIGHT / 1.2 - WIN_HEIGHT / 7, WIN_WIDTH / 3.2,
                          WIN_HEIGHT / 15, 'Menu')
     menu_button.draw(screen)
 
-    game_over_text = Button(RED, WIN_WIDTH / 2, WIN_HEIGHT / 2 - WIN_HEIGHT / 7, 0.1, 0.1, 'GAME OVER ^_^')
-    game_over_text.draw(screen)
+    #game_over_text = Button(RED, WIN_WIDTH / 2, WIN_HEIGHT / 2 - WIN_HEIGHT / 7, 0.1, 0.1, 'GAME OVER ^_^')
+    #game_over_text.draw(screen)
     pygame.display.update()
     run = True
     while run:
@@ -906,18 +909,10 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
                 mouse_pressed = pygame.mouse.get_pressed()
                 if next_level_button.is_pressed(mouse_pos, mouse_pressed):
                     dt = datetime.datetime.now() - datetime.datetime.now()
-                    if Number_of_level == 1:
-                        running_1 = 0
-                        is_pass_level_screen = False
-                        running_2 = 1
-                    elif Number_of_level == 2:
-                        running_2 = 0
-                        is_pass_level_screen = False
-                        running_3_1 = 1
-                    elif Number_of_level == 32:
-                        running_3_2 = 0
-                        is_hiryanov_menu = True
-                        is_pass_level_screen = False
+                    is_menu = True
+                    running_1 = 0
+                    is_pass_level_screen = False
+                    menu_music = False
                     run = False
                 if menu_button.is_pressed(mouse_pos, mouse_pressed):
                     dt = datetime.datetime.now() - datetime.datetime.now()
@@ -928,21 +923,17 @@ def pass_level_screen(bg, screen, your_time, your_time_seconds):
                     run = False
                 if restart_button.is_pressed(mouse_pos, mouse_pressed):
                     dt = datetime.datetime.now() - datetime.datetime.now()
-                    if Number_of_level == 1:
-                        is_restart = True
-                        running_1 = 0
-                        is_pass_level_screen = False
-                    if Number_of_level == 2:
-                        is_restart = True
-                        is_pass_level_screen = False
-                        running_2 = 0
+                    is_menu = True
+                    running_1 = 0
+                    is_pass_level_screen = False
+                    menu_music = False
                     run = False
         pygame.display.update()
     pygame.mixer.music.unpause()
     return running_1, is_menu, switch_pause, dt, is_pass_level_screen, running_2
 
 
-def hiryanov_menu(bg, screen):
+"""def hiryanov_menu(bg, screen):
     global is_hiryanov_menu, is_menu, menu_music, dt, progress
 
     pause_bg = pygame.image.load("Textures/hiryanov.png")
@@ -982,7 +973,7 @@ def hiryanov_menu(bg, screen):
                     menu_music = False
                     run = False
 
-
+"""
 def level_1(bg, screen):
     """
 
@@ -1125,7 +1116,7 @@ def level_1(bg, screen):
                     switch_pause = True
 
             hero.collide_enemy(enemies, hero)
-            if heart and hero.health == 0:
+            if heart and hero.health == 0 and god_mode == 0:
                 invisible_time = FPS // 1.5
                 hero.health = 100
                 heart = False
@@ -1133,7 +1124,7 @@ def level_1(bg, screen):
                 invisible_time -= 1
                 hero.health = 100
 
-            if hero.health > 0:
+            if hero.health or god_mode == 1  > 0:
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
                 typical_enemy_1.update()
@@ -1204,7 +1195,7 @@ def level_1(bg, screen):
                             is_gallery_sound = False
                         entities.remove(gallery_feature)
                         landay = True
-            elif hero.health <= 0:
+            elif hero.health<= 0 and god_mode == 0 :
                 is_game_over = True
                 run = False
                 running_1 = 0
@@ -1409,7 +1400,7 @@ def level_2(bg, screen):
                     running_2 = 2
 
             hero.collide_enemy(enemies, hero)
-            if heart and hero.health == 0:
+            if heart and hero.health == 0 and god_mode == 0:
                 invisible_time = FPS // 1.5
                 hero.health = 100
                 heart = False
@@ -1417,7 +1408,7 @@ def level_2(bg, screen):
                 invisible_time -= 1
                 hero.health = 100
 
-            if hero.health > 0:
+            if hero.health  > 0 or god_mode ==1:
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
                 typical_enemy_1.update(move_counter=25)
@@ -1649,7 +1640,7 @@ def level_2(bg, screen):
                     if sprite.collide_rect(hero, l):
                         hero.health = 0
                         invisible_time = 0
-            elif hero.health <= 0:
+            elif hero.health<= 0 and god_mode == 0 :
                 is_game_over = True
                 run = False
                 running_2 = 0
@@ -1727,7 +1718,7 @@ def level_3_1(bg, screen):
     entities.add(boss)
     enemies.append(boss)
 
-    boss.health = 30
+    boss.health = 100
 
     level = [
         "                                                ",
@@ -1800,7 +1791,7 @@ def level_3_1(bg, screen):
                 invisible_time -= 1
                 hero.health = 100
 
-            if hero.health > 0:
+            if hero.health > 0 or god_mode == 1:
 
                 date_time_obj2 = datetime.datetime.now()
                 time_delta = date_time_obj2 - date_time_obj1
@@ -2064,7 +2055,7 @@ def level_3_1(bg, screen):
                         running_3_1 = 0
                         is_game_over = True
 
-            elif hero.health <= 0:
+            elif hero.health <= 0 and god_mode == 0 :
                 Number_of_level = 31
                 is_game_over = True
                 run = False
@@ -2226,7 +2217,7 @@ def level_3_2(bg, screen, hh, you_time):
                 invisible_time -= 1
                 hero.health = 100
 
-            if hero.health > 0:
+            if hero.health > 0 or god_mode == 1:
 
                 screen.blit(bg, (0, 0))  # Каждую итерацию движения перса необходимо всё перерисовывать
                 hero.update(left, right, Up, platforms)  # передвижение
@@ -2495,7 +2486,7 @@ def level_3_2(bg, screen, hh, you_time):
                 if boss_left.health < 0:
                     boss_left.health = 0
 
-                if boss_right.health <= 0 and boss_left.health <= 0:
+                if boss_right.health <= 0 or boss_left.health <= 0:
                     your_time = time_delta_3
                     timestr = f'{your_time}'
                     ftr = [3600, 60, 1, 10 ** (-6)]
@@ -2506,16 +2497,16 @@ def level_3_2(bg, screen, hh, you_time):
                     except KeyError:
                         dict["your_time_seconds_3"] = your_time_seconds
 
-                    dict["amount_passed_levels"] = 3
+
                     dict["health"] = hero.health
                     dict["is_karasev"] = 1
                     progress = (dict["is_einstein"] + dict["is_landay"] + dict["is_karasev"] + dict["is_red_key"] +
                                 dict["is_yellow_key"]
                                 + dict["amount_passed_levels"] + is_1 + is_2 + is_3) * 100 // 11
-                    with open("saves.json", 'w') as foo:
-                        json.dump(dict, foo)
-                    with open("saves.json", 'r') as foo:
-                        dict = json.load(foo)
+                    #with open("saves.json", 'w') as foo:
+                        #json.dump(dict, foo)
+                    #with open("saves.json", 'r') as foo:
+                        #dict = json.load(foo)
 
                     menu_music = False
                     is_pass_level_screen = True
@@ -2553,7 +2544,7 @@ def level_3_2(bg, screen, hh, you_time):
 
                 pygame.display.update()
 
-            elif hero.health <= 0:
+            elif hero.health <= 0 and god_mode == 0:
                 Number_of_level = 31
                 is_game_over = True
                 run = False

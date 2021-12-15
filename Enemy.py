@@ -1,7 +1,8 @@
+#импортируем необходимое
 import pygame.draw
 from Player import *
 import ctypes
-
+#Константы
 user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)
 WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
@@ -22,23 +23,25 @@ class Enemy(sprite.Sprite):
         self.move_direction = move_direction
         self.move_counter = 0
         self.health = health
+        self.onGround = False
 
     def update(self, move_counter=50, enemy_image="typical_enemy", a=1, b=0, C=1, d=100,
-               screen=pygame.display.set_mode(DISPLAY), bottomleftX=0, bottomleftY=0, bottomrightX=0):
-        if enemy_image == "typical_enemy":
+               screen=pygame.display.set_mode(DISPLAY), bottomleftX=0, bottomleftY=0, bottomrightX=0, topleftX=0,
+               topleftY=0, s=2):
+        if enemy_image == "typical_enemy":#Движение "Богданова"
             self.rect.x += self.move_direction
-            self.move_counter += 1
-            if abs(self.move_counter) > move_counter:
+            self.move_counter += 1 #счетчик для того чтобы понять когда двигаться обратно
+            if abs(self.move_counter) > move_counter: #Движение в обратную сторону 
                 self.move_direction *= -1
                 self.move_counter *= -1
         if enemy_image == "bomb" or enemy_image == "bomb_mini" or enemy_image == "bomb_big_green" \
-                or enemy_image == "bomb_big_purple":
+                or enemy_image == "bomb_big_purple":#Движение всех бомбочек
             self.rect.x += self.move_direction * a / C
             self.rect.y += self.move_direction * b / C
-        if enemy_image == "boss_1":
+        if enemy_image == "boss_1_right" or enemy_image == "boss_1_left" or enemy_image == "boss_1":#Движение босса
             self.rect.x += self.move_direction
             self.move_counter += 1
-            pygame.draw.rect(screen, GREEN, (bottomleftX, bottomleftY, (bottomrightX-bottomleftX)*d, PLATFORM_HEIGHT/4))
+            pygame.draw.rect(screen, GREEN, (bottomleftX, bottomleftY, (bottomrightX-bottomleftX)*d, PLATFORM_HEIGHT/4))#Полоска с hp босса
             pygame.draw.rect(screen, RED, (bottomleftX+(bottomrightX-bottomleftX)*d, bottomleftY,
                                            (bottomrightX-bottomleftX)*(1-d), PLATFORM_HEIGHT/4))
             if abs(self.move_counter) > move_counter:
@@ -48,4 +51,8 @@ class Enemy(sprite.Sprite):
                 self.rect.y += b/abs(b) * abs(self.move_direction)
             if b == 0:
                 self.rect.y = self.rect.y
-
+        if enemy_image == "enemy_2_straight":
+            if not self.onGround:
+                self.rect.y += JUMP_POWER / 10
+            else:
+                pass

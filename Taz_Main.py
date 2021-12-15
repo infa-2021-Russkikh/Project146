@@ -1687,7 +1687,7 @@ def level_3_1(bg, screen):
     pygame.mixer.music.set_volume(dict["music_volume"])
     pygame.mixer.music.load("Music/boss_music_1.mp3")
     pygame.mixer.music.play(-1)
-
+    hero = Player(PLATFORM_WIDTH * 3, WIN_HEIGHT - PLATFORM_HEIGHT * 4)
     if dict["is_yellow_key"] == 0:
         hero = Player(PLATFORM_WIDTH * 3, WIN_HEIGHT - PLATFORM_HEIGHT * 4)  # создаем героя по (x,y) координатам
     elif dict["is_yellow_key"] == 1:

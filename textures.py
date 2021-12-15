@@ -7,7 +7,7 @@ import os
 from pygame import *
 import ctypes
 
-# Объявляем переменные
+# некотрые необходимые константы
 user32 = ctypes.windll.user32
 WIN_WIDTH = user32.GetSystemMetrics(0)
 WIN_HEIGHT = user32.GetSystemMetrics(1) - 55
